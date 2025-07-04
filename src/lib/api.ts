@@ -119,6 +119,7 @@ export interface Report {
   is_generated: boolean;
   created_at: string;
   ocr_result?: OCRResult;
+  error_message?: string;
 }
 
 export interface BatchFileItem {
