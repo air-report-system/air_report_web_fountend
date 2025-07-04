@@ -18,10 +18,10 @@ echo "✅ Node.js版本: $(node --version)"
 # 智能依赖检查
 if [ ! -d "node_modules" ]; then
     echo "📦 首次运行，安装依赖..."
-    npm install
+    npm install --legacy-peer-deps
 elif [ "package.json" -nt "node_modules" ]; then
     echo "📦 package.json已更新，重新安装依赖..."
-    npm install
+    npm install --legacy-peer-deps
 else
     echo "📦 依赖已是最新"
 fi

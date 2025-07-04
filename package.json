@@ -10,10 +10,12 @@
     "replit:start": "chmod +x start.sh && ./start.sh",
     "health-check": "node health-check.js",
     "cors-test": "node cors-test.js",
-    "deploy": "npm ci && npm run build && npm run start",
+    "deploy": "npm install --legacy-peer-deps && npm run build && npm run start",
     "quick-start": "chmod +x quick-start.sh && ./quick-start.sh",
     "test:connection": "npm run health-check && npm run cors-test",
-    "test:nix": "chmod +x test-nix-packages.sh && ./test-nix-packages.sh"
+    "test:nix": "chmod +x test-nix-packages.sh && ./test-nix-packages.sh",
+    "install:replit": "npm install --legacy-peer-deps",
+    "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

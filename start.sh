@@ -17,7 +17,7 @@ npm --version
 # 检查是否需要安装依赖
 if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
     echo "📦 安装项目依赖..."
-    npm ci --production=false
+    npm install --legacy-peer-deps
 else
     echo "📦 依赖已存在，跳过安装"
 fi
