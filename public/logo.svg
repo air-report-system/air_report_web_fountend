@@ -1,0 +1,112 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F1F8E9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4CAF50;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="particleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#81C784;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#64B5F6;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" stroke="url(#mainGradient)" stroke-width="4"/>
+  
+  <!-- 主要检测设备图标 -->
+  <g transform="translate(256, 256)">
+    <!-- 检测仪器主体 -->
+    <rect x="-60" y="-80" width="120" height="100" rx="15" fill="url(#mainGradient)" opacity="0.9"/>
+    
+    <!-- 显示屏 -->
+    <rect x="-45" y="-65" width="90" height="50" rx="8" fill="#FFFFFF" opacity="0.95"/>
+    
+    <!-- 显示屏内容 - 波形图 -->
+    <polyline points="-35,-50 -25,-40 -15,-55 -5,-35 5,-45 15,-30 25,-50 35,-40" 
+              stroke="url(#mainGradient)" stroke-width="3" fill="none"/>
+    
+    <!-- 数据点 -->
+    <circle cx="-25" cy="-40" r="2" fill="#4CAF50"/>
+    <circle cx="-5" cy="-35" r="2" fill="#4CAF50"/>
+    <circle cx="15" cy="-30" r="2" fill="#4CAF50"/>
+    <circle cx="35" cy="-40" r="2" fill="#4CAF50"/>
+    
+    <!-- 控制按钮 -->
+    <circle cx="-35" cy="5" r="8" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="0" cy="5" r="8" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="35" cy="5" r="8" fill="#FFFFFF" opacity="0.8"/>
+    
+    <!-- 按钮指示灯 -->
+    <circle cx="-35" cy="5" r="3" fill="#4CAF50"/>
+    <circle cx="0" cy="5" r="3" fill="#2196F3"/>
+    <circle cx="35" cy="5" r="3" fill="#FF9800"/>
+  </g>
+  
+  <!-- 空气粒子动画效果 -->
+  <g opacity="0.7">
+    <!-- 大粒子 -->
+    <circle cx="150" cy="180" r="6" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="180;160;180" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="380" cy="200" r="5" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="200;220;200" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="320" cy="150" r="4" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="150;130;150" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- 中等粒子 -->
+    <circle cx="180" cy="320" r="4" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="320;340;320" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="350" cy="340" r="3" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="340;320;340" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="120" cy="280" r="3" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="280;300;280" dur="3.2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- 小粒子 -->
+    <circle cx="200" cy="120" r="2" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="120;100;120" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="380" r="2" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="380;400;380" dur="2.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="400" cy="280" r="2" fill="url(#particleGradient)">
+      <animate attributeName="cy" values="280;260;280" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 数据流线条 -->
+  <g opacity="0.6">
+    <path d="M 100 256 Q 180 200 256 256 Q 332 312 412 256" 
+          stroke="url(#mainGradient)" stroke-width="2" fill="none" stroke-dasharray="5,5">
+      <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 256 100 Q 200 180 256 256 Q 312 332 256 412" 
+          stroke="url(#mainGradient)" stroke-width="2" fill="none" stroke-dasharray="5,5">
+      <animate attributeName="stroke-dashoffset" values="0;-10" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- 报告文档图标 -->
+  <g transform="translate(180, 350)" opacity="0.8">
+    <rect x="0" y="0" width="30" height="40" rx="3" fill="#FFFFFF" stroke="url(#mainGradient)" stroke-width="2"/>
+    <line x1="5" y1="8" x2="25" y2="8" stroke="url(#mainGradient)" stroke-width="1"/>
+    <line x1="5" y1="15" x2="25" y2="15" stroke="url(#mainGradient)" stroke-width="1"/>
+    <line x1="5" y1="22" x2="20" y2="22" stroke="url(#mainGradient)" stroke-width="1"/>
+    <line x1="5" y1="29" x2="18" y2="29" stroke="url(#mainGradient)" stroke-width="1"/>
+  </g>
+  
+  <!-- 检测图标 -->
+  <g transform="translate(300, 120)" opacity="0.8">
+    <circle cx="15" cy="15" r="12" fill="none" stroke="url(#mainGradient)" stroke-width="3"/>
+    <circle cx="15" cy="15" r="6" fill="url(#particleGradient)"/>
+    <path d="M 25 25 L 35 35" stroke="url(#mainGradient)" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

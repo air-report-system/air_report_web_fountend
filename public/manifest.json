@@ -1,0 +1,69 @@
+{
+  "name": "室内空气检测数据处理系统",
+  "short_name": "空气检测系统",
+  "description": "基于AI的室内空气质量检测报告生成系统",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E3F2FD",
+  "theme_color": "#2196F3",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "报告生成",
+      "short_name": "报告",
+      "description": "生成空气质量检测报告",
+      "url": "/reports",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "批量处理",
+      "short_name": "批量",
+      "description": "批量处理检测数据",
+      "url": "/batch",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "月度报表",
+      "short_name": "报表",
+      "description": "查看月度统计报表",
+      "url": "/monthly",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "32x32",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
