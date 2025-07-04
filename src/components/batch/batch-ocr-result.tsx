@@ -220,7 +220,7 @@ export function BatchOCRResult({
 
   // OCR处理mutation
   const ocrMutation = useMutation({
-    mutationFn: (file: File) => ocrApi.processImage(file),
+    mutationFn: (file: File) => ocrApi.uploadAndProcess(file),
     onSuccess: (data) => {
       setOcrResult(data.data);
       setIsProcessingOCR(false);

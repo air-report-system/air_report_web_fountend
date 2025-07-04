@@ -92,7 +92,7 @@ export function PointLearningManager({
 
   // 更新点位学习数据
   const updateLearningMutation = useMutation({
-    mutationFn: (data: { points_data: Record<string, number>; check_type?: string }) =>
+    mutationFn: (data: { points_data: Record<string, number>; check_type?: 'initial' | 'recheck' }) =>
       pointLearningApi.updateLearning(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['point-suggestions'] });
@@ -284,7 +284,7 @@ export function PointLearningManager({
               <div className="text-center py-4">加载建议中...</div>
             ) : suggestions?.data?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {suggestions.data.map((suggestion: PointSuggestion) => (
+                {suggestions?.data?.map((suggestion: PointSuggestion) => (
                   <div
                     key={suggestion.point_name}
                     className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"

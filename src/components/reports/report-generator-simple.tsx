@@ -127,10 +127,15 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
 
       // 填充基本信息
       setFormData(prev => {
+        // 确保check_type是有效值
+        const validCheckType = (ocrResult.check_type === 'initial' || ocrResult.check_type === 'recheck')
+          ? ocrResult.check_type
+          : prev.check_type;
+
         const newFormData = {
           ...prev,
           sampling_date: ocrResult.date || prev.sampling_date,
-          check_type: ocrResult.check_type || prev.check_type,
+          check_type: validCheckType,
           temperature: ocrResult.temperature?.toString() || prev.temperature,
           humidity: ocrResult.humidity?.toString() || prev.humidity,
           // 如果有联系人信息，填充联系人和地址

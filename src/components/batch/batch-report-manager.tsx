@@ -85,7 +85,7 @@ export function BatchReportManager({
       }
     },
     onSuccess: (data, variables) => {
-      const report = reports.find(r => r.id === variables.reportId);
+      const report = reports.find((r: any) => r.id === variables.reportId);
       const filename = `${report?.title || 'report'}.${variables.format}`;
 
       // 检查响应数据类型
@@ -120,7 +120,7 @@ export function BatchReportManager({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedReports(reports.map(r => r.id));
+      setSelectedReports(reports.map((r: any) => r.id));
     } else {
       setSelectedReports([]);
     }
@@ -398,7 +398,7 @@ export function BatchReportManager({
               <div>暂无报告</div>
             </div>
           ) : (
-            reports.map((report) => (
+            reports.map((report: any) => (
               <div
                 key={report.id}
                 className="flex items-center gap-4 p-3 border rounded-lg hover:bg-gray-50"
@@ -565,8 +565,8 @@ export function BatchReportManager({
             共 {totalReports} 个报告，当前页显示 {reports.length} 个
           </div>
           <div className="flex items-center gap-4">
-            <span>已生成: {reports.filter(r => r.is_generated).length}</span>
-            <span>待生成: {reports.filter(r => !r.is_generated).length}</span>
+            <span>已生成: {reports.filter((r: any) => r.is_generated).length}</span>
+            <span>待生成: {reports.filter((r: any) => !r.is_generated).length}</span>
           </div>
         </div>
       </CardContent>

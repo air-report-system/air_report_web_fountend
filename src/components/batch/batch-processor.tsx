@@ -26,6 +26,7 @@ import {
   Settings
 } from 'lucide-react';
 import { batchApi, BatchJob, BatchFileItem } from '@/lib/api';
+import { AxiosError } from 'axios';
 import { formatError, formatDateTime, formatFileSize } from '@/lib/utils';
 
 interface BatchProcessorProps {
@@ -78,11 +79,13 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
       // 通知父组件批量任务已创建
       onBatchJobCreated?.(batchJob);
     },
-    onError: (error) => {
+    onError: (error: AxiosError | Error) => {
       console.error('批量上传错误:', error);
-      console.error('错误响应:', error.response);
-      console.error('错误状态:', error.response?.status);
-      console.error('错误数据:', error.response?.data);
+      if ('response' in error) {
+        console.error('错误响应:', error.response);
+        console.error('错误状态:', error.response?.status);
+        console.error('错误数据:', error.response?.data);
+      }
       const errorMessage = formatError(error);
       onError?.(errorMessage);
     },
