@@ -15,7 +15,8 @@
     "test:connection": "npm run health-check && npm run cors-test",
     "test:nix": "chmod +x test-nix-packages.sh && ./test-nix-packages.sh",
     "install:replit": "npm install --legacy-peer-deps",
-    "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps"
+    "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps",
+    "fix:deps": "chmod +x fix-dependencies.sh && ./fix-dependencies.sh"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -28,18 +29,18 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^3.4.17",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }
