@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, FileText, CheckCircle, AlertCircle } from 'lucide-react';
-import { getApiBaseUrl } from '@/lib/utils';
+import { getApiBaseUrl, reformatCsvData } from '@/lib/utils';
 
 interface OrderData {
   客户姓名: string;
@@ -324,7 +324,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
               <div>
                 <Label>CSV格式预览</Label>
                 <Textarea
-                  value={formattedCsv}
+                  value={reformatCsvData(formattedCsv)}
                   readOnly
                   rows={3}
                   className="mt-1 bg-gray-50 font-mono text-sm"
