@@ -287,6 +287,85 @@ export function getFileExtension(filename: string): string {
 }
 
 /**
+ * 格式化CSV字段 - 正确处理包含特殊字符的字段
+ */
+export function formatCsvField(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  const stringValue = String(value);
+
+  // 如果字段包含逗号、引号、换行符或者是JSON字符串，需要用引号包围并转义内部引号
+  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r') ||
+      (stringValue.startsWith('{') && stringValue.endsWith('}'))) {
+    // 转义内部的引号（将 " 替换为 ""）
+    const escapedValue = stringValue.replace(/"/g, '""');
+    return `"${escapedValue}"`;
+  }
+
+  return stringValue;
+}
+
+/**
+ * 格式化CSV行数据
+ */
+export function formatCsvRow(fields: (string | number | null | undefined)[]): string {
+  return fields.map(field => formatCsvField(field)).join(',');
+}
+
+/**
+ * 重新格式化CSV数据 - 修复后端返回的格式问题
+ */
+export function reformatCsvData(csvData: string): string {
+  if (!csvData || !csvData.trim()) {
+    return csvData;
+  }
+
+  try {
+    // 分割成行
+    const lines = csvData.trim().split('\n');
+    const reformattedLines: string[] = [];
+
+    for (const line of lines) {
+      // 修复被错误分割的JSON字段
+      const fixedLine = fixBrokenJsonInCsv(line);
+      reformattedLines.push(fixedLine);
+    }
+
+    return reformattedLines.join('\n');
+  } catch (error) {
+    console.warn('CSV重新格式化失败，返回原始数据:', error);
+    return csvData;
+  }
+}
+
+/**
+ * 修复CSV中被错误分割的JSON字段
+ */
+function fixBrokenJsonInCsv(csvLine: string): string {
+  // 处理特定的JSON分割模式："""{...}""","""...}"""
+  return csvLine.replace(/"""\{([^}]*)\}""","""([^}]*)\}"""/g, (match, part1, part2) => {
+    try {
+      // 清理第二部分中多余的引号
+      const cleanPart2 = part2.replace(/"":/g, ':');
+
+      // 重新组合JSON内容，保持简洁格式（不为键名添加引号）
+      const jsonContent = `{${part1},${cleanPart2}}`;
+
+      // 返回正确的CSV格式（用双引号包围整个JSON字段）
+      return `"${jsonContent}"`;
+    } catch (error) {
+      // 如果无法修复，返回原始内容
+      console.warn('无法修复JSON字段:', match, error);
+      return match;
+    }
+  });
+}
+
+
+
+/**
  * 检查是否为移动设备
  */
 export function isMobile(): boolean {
