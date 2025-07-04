@@ -116,7 +116,11 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
 
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`http://localhost:8000/api/v1/orders/records/${record.id}/`, {
+
+      // 使用工具函数获取API基础URL
+      const baseUrl = getApiBaseUrl();
+
+      const response = await fetch(`${baseUrl}/orders/records/${record.id}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Token ${token}`
