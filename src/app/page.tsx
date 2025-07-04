@@ -13,7 +13,8 @@ import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Upload, BarChart3, MessageSquare, Settings, ShoppingCart, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Upload, BarChart3, Settings, ShoppingCart } from 'lucide-react';
+import { OCRResult } from '@/lib/api';
 
 // 创建QueryClient实例
 const queryClient = new QueryClient({
@@ -29,8 +30,7 @@ const queryClient = new QueryClient({
 function MainApp() {
   const [activeTab, setActiveTab] = useState('ocr');
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [currentOcrResult, setCurrentOcrResult] = useState<any>(null);
-  const [currentReport, setCurrentReport] = useState<any>(null);
+  const [currentOcrResult, setCurrentOcrResult] = useState<OCRResult | null>(null);
   const [mounted, setMounted] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -227,10 +227,9 @@ function MainApp() {
                     {/* 右侧：报告生成 */}
                     <div>
                       <ReportGenerator
-                        ocrResult={currentOcrResult}
+                        ocrResult={currentOcrResult || undefined}
                         onSuccess={(report) => {
                           showNotification('success', '报告创建成功！');
-                          setCurrentReport(report);
                           console.log('报告结果:', report);
                         }}
                         onError={(error) => {
