@@ -14,35 +14,24 @@ import { Progress } from '@/components/ui/progress';
 import {
   CheckCircle,
   AlertCircle,
-  Clock,
-  Edit3,
-  Save,
-  X,
   Plus,
   Trash2,
   FileText,
-  SkipForward,
   RefreshCw,
   Brain,
+  Loader2,
   AlertTriangle,
-  Image as ImageIcon,
-  Loader2
+  SkipForward
 } from 'lucide-react';
-import { BatchFileItem, OCRResult, reportApi, ocrApi, pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
+import { BatchFileItem, OCRResult, Report, reportApi, ocrApi, pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
 import { formatError, formatDateTime } from '@/lib/utils';
 import { queryKeys } from '@/lib/query-client';
 
-interface PointSuggestion {
-  point_name: string;
-  usage_count: number;
-  avg_value: number;
-  confidence: number;
-  source: 'learned' | 'default';
-}
+
 
 interface BatchOCRResultProps {
   fileItem: BatchFileItem;
-  onGenerateReport?: (reportData: any) => void;
+  onGenerateReport?: (reportData: Record<string, unknown>) => void;
   onSkip?: () => void;
   onError?: (error: string) => void;
   onSuccess?: (message: string) => void;
@@ -71,7 +60,7 @@ export function BatchOCRResult({
   const [pointsData, setPointsData] = useState<Record<string, number>>({});
   const [inferredCheckType, setInferredCheckType] = useState<'initial' | 'recheck' | null>(null);
   const [checkTypeConfidence, setCheckTypeConfidence] = useState<number>(0);
-  const [createdReport, setCreatedReport] = useState<any>(null);
+  const [createdReport, setCreatedReport] = useState<Report | null>(null);
   const [pollingReportId, setPollingReportId] = useState<number | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -568,7 +557,7 @@ export function BatchOCRResult({
                   {inferredCheckType && inferredCheckType !== formData.check_type && checkTypeConfidence > 0.7 && (
                     <p className="text-sm text-orange-600 mt-1">
                       <AlertCircle className="inline h-3 w-3 mr-1" />
-                      AI建议选择"{inferredCheckType === 'initial' ? '初检' : '复检'}"
+                      AI建议选择&ldquo;{inferredCheckType === 'initial' ? '初检' : '复检'}&rdquo;
                     </p>
                   )}
                 </div>

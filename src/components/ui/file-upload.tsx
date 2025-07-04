@@ -103,7 +103,7 @@ export function FileUpload({
     setErrors([]);
   }, [onFilesChange]);
 
-  const getAcceptedFileTypes = () => {
+  const getAcceptedFileTypes = (): Record<string, string[]> | undefined => {
     switch (accept) {
       case 'image':
         return {

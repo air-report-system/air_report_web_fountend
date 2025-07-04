@@ -12,12 +12,12 @@ import { Badge } from '@/components/ui/badge';
 import { 
   TestTube, 
   Play, 
-  CheckCircle, 
-  XCircle, 
+  CheckCircle,
+  XCircle,
   AlertTriangle,
   RefreshCw,
   Database,
-  Sync
+  RotateCcw
 } from 'lucide-react';
 import { 
   pointLearningApi, 
@@ -57,7 +57,7 @@ export function PointLearningTest() {
 
   // 点位学习更新测试
   const updateLearningMutation = useMutation({
-    mutationFn: (data: { points_data: Record<string, number>; check_type?: string }) =>
+    mutationFn: (data: { points_data: Record<string, number>; check_type?: 'initial' | 'recheck' }) =>
       pointLearningApi.updateLearning(data),
   });
 
@@ -253,7 +253,7 @@ export function PointLearningTest() {
               variant="outline"
               onClick={() => refetchSyncStatus()}
             >
-              <Sync className="mr-2 h-4 w-4" />
+              <RotateCcw className="mr-2 h-4 w-4" />
               刷新状态
             </Button>
           </div>
