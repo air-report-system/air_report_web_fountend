@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
   // 图片优化配置
   images: {
     unoptimized: true,
+    domains: process.env.BACKEND_URL ? [new URL(process.env.BACKEND_URL).hostname] : ['localhost'],
   },
 
   // 开发环境跨域配置
@@ -34,7 +35,34 @@ const nextConfig: NextConfig = {
     '192.168.0.0/16',  // 允许整个 192.168.x.x 网段
     '10.0.0.0/8',      // 允许 10.x.x.x 网段
     '172.16.0.0/12',   // 允许 172.16.x.x - 172.31.x.x 网段
+    '*.replit.app',    // 允许Replit域名
+    '*.replit.dev',    // 允许Replit开发域名
   ],
+
+  // Replit特定配置
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+    ];
+  },
+
+  // 环境变量配置
+  env: {
+    BACKEND_URL: process.env.BACKEND_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
 };
 
 export default nextConfig;

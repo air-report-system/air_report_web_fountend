@@ -1,0 +1,96 @@
+# Replit配置文件 - Next.js前端项目
+# 室内空气检测数据处理系统
+
+# 运行命令
+run = "npm run start"
+
+# 入口点
+entrypoint = "src/app/page.tsx"
+
+# 隐藏的文件和目录
+hidden = [".config", "package-lock.json"]
+
+# 语言设置
+[languages]
+
+[languages.javascript]
+pattern = "**/{*.js,*.jsx,*.ts,*.tsx,*.json}"
+
+[languages.javascript.languageServer]
+start = "typescript-language-server --stdio"
+
+# Nix包配置
+[nix]
+channel = "stable-22_11"
+
+# 部署配置
+[deployment]
+run = ["sh", "-c", "npm run build && npm run start"]
+deploymentTarget = "cloudrun"
+ignorePorts = false
+
+# 环境变量
+[env]
+NODE_ENV = "production"
+PORT = "3000"
+# 后端API URL - 需要根据实际后端部署地址修改
+BACKEND_URL = "https://your-backend-repl-url.replit.app"
+NEXT_PUBLIC_API_URL = "https://your-backend-repl-url.replit.app/api/v1"
+
+# 端口配置
+[[ports]]
+localPort = 3000
+externalPort = 80
+exposeLocalhost = true
+
+# 包管理器
+[packager]
+language = "nodejs"
+
+[packager.features]
+packageSearch = true
+guessImports = true
+enabledForHosting = false
+
+# Git配置
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+# 调试配置
+[debugger]
+support = true
+
+[debugger.interactive]
+transport = "localhost:0"
+startCommand = ["dap-node"]
+
+[debugger.interactive.initializeMessage]
+command = "initialize"
+type = "request"
+
+[debugger.interactive.initializeMessage.arguments]
+clientID = "replit"
+clientName = "replit.com"
+columnsStartAt1 = true
+linesStartAt1 = true
+locale = "en-us"
+pathFormat = "path"
+supportsInvalidatedEvent = true
+supportsProgressReporting = true
+supportsRunInTerminalRequest = true
+supportsVariablePaging = true
+supportsVariableType = true
+
+[debugger.interactive.launchMessage]
+command = "launch"
+type = "request"
+
+[debugger.interactive.launchMessage.arguments]
+console = "externalTerminal"
+cwd = "."
+pauseForSourceMap = false
+program = "./src/app/page.tsx"
+request = "launch"
+sourceMaps = true
+stopOnEntry = false
+type = "node"

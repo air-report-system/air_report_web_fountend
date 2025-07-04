@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "replit:start": "chmod +x start.sh && ./start.sh",
+    "health-check": "node health-check.js",
+    "cors-test": "node cors-test.js",
+    "deploy": "npm run build && npm run start",
+    "test:connection": "npm run health-check && npm run cors-test"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
