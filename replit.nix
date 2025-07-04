@@ -3,7 +3,7 @@
   deps = [
     # Node.js运行时 (修复包名)
     pkgs.nodejs_18
-    pkgs.npm-9_x
+    pkgs.nodePackages.npm
 
     # TypeScript工具
     pkgs.typescript
