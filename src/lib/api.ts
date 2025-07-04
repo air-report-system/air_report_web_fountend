@@ -100,7 +100,7 @@ export interface OCRResult {
   date: string;
   temperature: string;
   humidity: string;
-  check_type: string;
+  check_type: 'initial' | 'recheck' | string;
   points_data: Record<string, number>;
   confidence_score: number;
   status: 'pending' | 'processing' | 'completed' | 'failed';
