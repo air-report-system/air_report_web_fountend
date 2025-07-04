@@ -21,7 +21,7 @@ start = "typescript-language-server --stdio"
 
 # Nix包配置
 [nix]
-channel = "stable-22_11"
+channel = "stable-24_05"
 
 # 部署配置
 [deployment]
