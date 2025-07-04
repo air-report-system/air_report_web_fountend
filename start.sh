@@ -14,20 +14,28 @@ echo "📋 检查Node.js版本..."
 node --version
 npm --version
 
-# 安装依赖
-echo "📦 安装项目依赖..."
-npm ci --production=false
-
-# 构建项目
-echo "🔨 构建Next.js项目..."
-npm run build
-
-# 检查构建结果
-if [ $? -eq 0 ]; then
-    echo "✅ 构建成功！"
+# 检查是否需要安装依赖
+if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
+    echo "📦 安装项目依赖..."
+    npm ci --production=false
 else
-    echo "❌ 构建失败！"
-    exit 1
+    echo "📦 依赖已存在，跳过安装"
+fi
+
+# 检查是否需要构建
+if [ ! -d ".next" ] || [ "package.json" -nt ".next" ]; then
+    echo "🔨 构建Next.js项目..."
+    npm run build
+
+    # 检查构建结果
+    if [ $? -eq 0 ]; then
+        echo "✅ 构建成功！"
+    else
+        echo "❌ 构建失败！"
+        exit 1
+    fi
+else
+    echo "🔨 构建文件已存在且是最新的，跳过构建"
 fi
 
 # 启动应用
