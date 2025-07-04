@@ -100,7 +100,11 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:8000/api/v1/orders/submit/', {
+
+      // 使用工具函数获取API基础URL
+      const baseUrl = getApiBaseUrl();
+
+      const response = await fetch(`${baseUrl}/orders/submit/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
