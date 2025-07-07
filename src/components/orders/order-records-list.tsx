@@ -31,6 +31,7 @@ import {
   Package
 } from 'lucide-react';
 import { getApiBaseUrl } from '@/lib/utils';
+import { OrderEditDialog } from './order-edit-dialog';
 
 interface OrderRecord {
   id: number;
@@ -64,31 +65,21 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
   const [selectedRecord, setSelectedRecord] = useState<OrderRecord | null>(null);
+  const [editingRecord, setEditingRecord] = useState<OrderRecord | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('auth_token');
-      const params = new URLSearchParams();
-      if (searchName) params.append('customer_name', searchName);
-      if (searchPhone) params.append('customer_phone', searchPhone);
-      if (selectedMonth) params.append('fulfillment_month', selectedMonth);
+      const { ordersApi } = await import('@/lib/api');
+      const params: { [key: string]: string } = {};
+      
+      if (searchName) params.customer_name = searchName;
+      if (searchPhone) params.customer_phone = searchPhone;
+      if (selectedMonth) params.fulfillment_month = selectedMonth;
 
-      // 使用工具函数获取API基础URL
-      const baseUrl = getApiBaseUrl();
-
-      const response = await fetch(`${baseUrl}/orders/records/?${params}`, {
-        headers: {
-          'Authorization': `Token ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('获取订单记录失败');
-      }
-
-      const data = await response.json();
-      setRecords(data.results || data);
+      const response = await ordersApi.getRecords(params);
+      setRecords(response.data.results || response.data);
     } catch (error) {
       onError?.(error instanceof Error ? error.message : '获取记录失败');
     } finally {
@@ -115,21 +106,9 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
     }
 
     try {
-      const token = localStorage.getItem('auth_token');
-
-      // 使用工具函数获取API基础URL
-      const baseUrl = getApiBaseUrl();
-
-      const response = await fetch(`${baseUrl}/orders/records/${record.id}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Token ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('删除记录失败');
-      }
+      // 使用 ordersApi 进行删除
+      const { ordersApi } = await import('@/lib/api');
+      await ordersApi.deleteRecord(record.id);
 
       // 刷新列表
       fetchRecords();
@@ -137,6 +116,23 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
     } catch (error) {
       onError?.(error instanceof Error ? error.message : '删除失败');
     }
+  };
+
+  const handleEditRecord = (record: OrderRecord) => {
+    setEditingRecord(record);
+    setShowEditDialog(true);
+  };
+
+  const handleEditSuccess = (updatedRecord: OrderRecord) => {
+    // 刷新列表
+    fetchRecords();
+    // 移除自动跳转，编辑完成后留在当前页面
+    // onEdit?.(updatedRecord);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditingRecord(null);
+    setShowEditDialog(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -386,7 +382,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => onEdit?.(record)}
+                            onClick={() => handleEditRecord(record)}
                             title="编辑"
                           >
                             <Edit className="h-3 w-3" />
@@ -474,7 +470,8 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                   关闭
                 </Button>
                 <Button onClick={() => {
-                  onEdit?.(selectedRecord);
+                  // 直接调用内部的编辑函数而不是外部的onEdit回调
+                  handleEditRecord(selectedRecord);
                   setSelectedRecord(null);
                 }}>
                   编辑
@@ -484,6 +481,15 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
           </Card>
         </div>
       )}
+
+      {/* 编辑对话框 */}
+      <OrderEditDialog
+        record={editingRecord}
+        open={showEditDialog}
+        onClose={handleCloseEditDialog}
+        onSuccess={handleEditSuccess}
+        onError={onError}
+      />
     </div>
   );
 }
