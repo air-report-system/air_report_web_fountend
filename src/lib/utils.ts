@@ -382,14 +382,38 @@ export function formatError(error: any): string {
     return error;
   }
 
-  if (error?.response?.data?.error) {
-    return error.response.data.error;
+  // 检查是否是axios错误
+  if (error?.response) {
+    const { data, status, statusText } = error.response;
+    
+    // 检查是否是HTML响应(通常是服务器错误页面)
+    if (typeof data === 'string' && data.includes('<html>')) {
+      return `服务器错误 (${status}): ${statusText || '内部服务器错误'}`;
+    }
+    
+    // 检查是否是JSON响应
+    if (typeof data === 'object' && data !== null) {
+      if (data.error) {
+        return data.error;
+      }
+      if (data.message) {
+        return data.message;
+      }
+      if (data.detail) {
+        return data.detail;
+      }
+    }
+    
+    // 如果data是字符串但不是HTML，直接返回
+    if (typeof data === 'string' && data.trim()) {
+      return data;
+    }
+    
+    // 使用HTTP状态码和状态文本
+    return `请求失败 (${status}): ${statusText || '网络错误'}`;
   }
 
-  if (error?.response?.data?.message) {
-    return error.response.data.message;
-  }
-
+  // 网络错误或其他错误
   if (error?.message) {
     return error.message;
   }

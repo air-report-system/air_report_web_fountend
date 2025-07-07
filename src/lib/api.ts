@@ -48,6 +48,19 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+    
+    // 处理HTML错误响应，防止React尝试渲染HTML
+    if (error.response?.data && typeof error.response.data === 'string' && error.response.data.includes('<html>')) {
+      // 将HTML响应替换为结构化错误
+      const status = error.response.status;
+      const statusText = error.response.statusText;
+      error.response.data = {
+        error: `服务器错误 (${status}): ${statusText || '内部服务器错误'}`,
+        message: `请求失败，服务器返回了HTML页面而不是JSON数据`,
+        status_code: status
+      };
+    }
+    
     return Promise.reject(error);
   }
 );
