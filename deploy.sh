@@ -33,11 +33,16 @@ if [ ! -d ".next" ]; then
     exit 1
 fi
 
+if [ ! -f ".next/standalone/server.js" ]; then
+    echo "❌ standalone服务器文件不存在"
+    exit 1
+fi
+
 echo "✅ 构建成功"
 
 # 启动应用并确保端口正确绑定
 echo "🌟 启动应用服务器..."
 echo "📍 应用将在 http://$HOSTNAME:$PORT 上运行"
 
-# 使用exec确保进程正确替换
+# 使用exec确保进程正确替换，使用standalone模式
 exec npm run start

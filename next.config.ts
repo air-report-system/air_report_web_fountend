@@ -67,6 +67,8 @@ const nextConfig: NextConfig = {
   env: {
     BACKEND_URL: process.env.BACKEND_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    PORT: process.env.PORT,
+    HOSTNAME: process.env.HOSTNAME,
   },
 };
 
