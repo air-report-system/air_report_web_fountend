@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   // 图片优化配置
   images: {
     unoptimized: true,
-    domains: process.env.BACKEND_URL ? [new URL(process.env.BACKEND_URL).hostname] : ['localhost'],
+    domains: process.env.BACKEND_URL ? [new URL(process.env.BACKEND_URL).hostname] : ['localhost', 'alicee.me'],
   },
 
   // 开发环境跨域配置
@@ -40,6 +40,8 @@ const nextConfig: NextConfig = {
     '198.18.0.0/16',   // 允许整个 198.18.x.x 网段
     '*.replit.app',    // 允许Replit域名
     '*.replit.dev',    // 允许Replit开发域名
+    'alicee.me',       // 允许alicee.me域名
+    '*.alicee.me',     // 允许alicee.me的子域名
   ],
 
   // Replit特定配置
