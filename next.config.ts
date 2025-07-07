@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 输出配置
-  output: 'standalone',
+  // 输出配置 - 使用默认模式
+  // output: 'standalone',
 
   // 图片优化配置
   images: {
