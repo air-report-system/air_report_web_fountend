@@ -16,7 +16,7 @@ export function getApiBaseUrl(): string {
 // 创建axios实例
 const api = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 30000,
+  timeout: 120000, // 增加到2分钟，因为AI处理可能需要更长时间
   headers: {
     'Content-Type': 'application/json',
   },
@@ -454,6 +454,39 @@ export const authApi = {
 
   // 检查认证状态
   checkAuth: () => api.get('/auth/profile/'),
+};
+
+// 订单相关API
+export const ordersApi = {
+  // 单个订单处理
+  process: (orderText: string) => 
+    api.post('/orders/process/', { order_text: orderText }),
+
+  // 批量订单处理
+  processMultiple: (orderTexts: string) =>
+    api.post('/orders/process-multiple/', { order_text: orderTexts }, {
+      timeout: 120000, // 2分钟超时，AI处理需要更长时间
+    }),
+
+  // 订单提交
+  submit: (orderDataList: any[]) =>
+    api.post('/orders/submit-multiple/', { order_data_list: orderDataList }),
+
+  // 获取订单记录列表
+  getRecords: (params?: { page?: number; page_size?: number }) => 
+    api.get('/orders/records/', { params }),
+
+  // 创建订单记录
+  createRecord: (data: any) => 
+    api.post('/orders/records/', data),
+
+  // 更新订单记录
+  updateRecord: (id: number, data: any) => 
+    api.put(`/orders/records/${id}/`, data),
+
+  // 删除订单记录
+  deleteRecord: (id: number) => 
+    api.delete(`/orders/records/${id}/`),
 };
 
 export default api;
