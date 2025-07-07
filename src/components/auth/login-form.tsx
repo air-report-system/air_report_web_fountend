@@ -125,8 +125,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            <p>默认管理员账号：admin / admin123</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500">
               首次使用请联系管理员创建账号
             </p>
           </div>
