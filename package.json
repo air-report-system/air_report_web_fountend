@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node start-standalone.js",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "replit:start": "chmod +x start.sh && ./start.sh",
     "health-check": "node health-check.js",

@@ -25,7 +25,8 @@ channel = "stable-24_05"
 
 # 部署配置
 [deployment]
-run = ["sh", "-c", "chmod +x deploy.sh && ./deploy.sh"]
+build = ["sh", "-c", "npm install --legacy-peer-deps && npm run build"]
+run = ["sh", "-c", "chmod +x fast-start.sh && ./fast-start.sh"]
 deploymentTarget = "cloudrun"
 ignorePorts = false
 
