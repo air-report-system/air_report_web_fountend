@@ -5,12 +5,19 @@ import axios from 'axios';
 
 // 获取API基础URL的函数
 export function getApiBaseUrl(): string {
-  // 在生产环境中，使用相对路径
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    return '/api/v1';
+  // 优先使用环境变量中的API URL
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (apiUrl) {
+    return apiUrl;
   }
-  // 在开发环境中，使用环境变量或默认localhost
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+  
+  // 在开发环境中，使用localhost
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000/api/v1';
+  }
+  
+  // 生产环境中如果没有设置API URL，则使用相对路径（通过Next.js rewrite代理）
+  return '/api/v1';
 }
 
 // 创建axios实例

@@ -34,9 +34,9 @@ ignorePorts = false
 [env]
 NODE_ENV = "production"
 PORT = "3000"
-# 后端API URL - 需要根据实际后端部署地址修改
-BACKEND_URL = "https://your-backend-repl-url.replit.app"
-NEXT_PUBLIC_API_URL = "https://your-backend-repl-url.replit.app/api/v1"
+# 后端API URL - 从Replit secrets中获取
+BACKEND_URL = "$BACKEND_URL"
+NEXT_PUBLIC_API_URL = "$NEXT_PUBLIC_API_URL"
 
 # 端口配置
 [[ports]]
