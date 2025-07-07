@@ -8,10 +8,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Air Report System" }],
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "16x16" },
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/logo.svg", type: "image/svg+xml", sizes: "512x512" }
     ],
-    shortcut: "/favicon.svg",
+    shortcut: "/favicon.ico",
     apple: "/logo.svg",
   },
   manifest: "/manifest.json",
@@ -31,8 +32,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="16x16" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/logo.svg" />
         <meta name="theme-color" content="#2196F3" />
       </head>
