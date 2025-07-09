@@ -21,6 +21,7 @@ import {
 import { BatchProcessor } from './batch-processor';
 import { BatchStepProcessor } from './batch-step-processor';
 import { BatchReportManager } from './batch-report-manager';
+import { BatchJobList } from './batch-job-list';
 import { BatchJob, batchApi } from '@/lib/api';
 
 interface BatchProcessingPageProps {
@@ -174,6 +175,7 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
       case 'process': return <Settings className="h-4 w-4" />;
       case 'monitor': return <BarChart3 className="h-4 w-4" />;
       case 'reports': return <Download className="h-4 w-4" />;
+      case 'tasks': return <FileText className="h-4 w-4" />;
       default: return <FileText className="h-4 w-4" />;
     }
   };
@@ -287,32 +289,36 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
           saveSessionState(currentBatchJob, newTab, processingMode);
         }
       }} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="upload" className="flex items-center gap-2">
-            {getTabIcon('upload')}
-            文件上传
-          </TabsTrigger>
-          <TabsTrigger
-            value="process"
-            disabled={!currentBatchJob}
-            className={`flex items-center gap-2 ${!currentBatchJob ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {getTabIcon('process')}
-            逐张处理
-          </TabsTrigger>
-          <TabsTrigger
-            value="monitor"
-            disabled={!currentBatchJob}
-            className={`flex items-center gap-2 ${!currentBatchJob ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {getTabIcon('monitor')}
-            进度监控
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            {getTabIcon('reports')}
-            报告管理
-          </TabsTrigger>
-        </TabsList>
+      <TabsList className="grid w-full grid-cols-5">
+        <TabsTrigger value="upload" className="flex items-center gap-2">
+          {getTabIcon('upload')}
+          文件上传
+        </TabsTrigger>
+        <TabsTrigger
+          value="process"
+          disabled={!currentBatchJob}
+          className={`flex items-center gap-2 ${!currentBatchJob ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {getTabIcon('process')}
+          逐张处理
+        </TabsTrigger>
+        <TabsTrigger
+          value="monitor"
+          disabled={!currentBatchJob}
+          className={`flex items-center gap-2 ${!currentBatchJob ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {getTabIcon('monitor')}
+          进度监控
+        </TabsTrigger>
+        <TabsTrigger value="reports" className="flex items-center gap-2">
+          {getTabIcon('reports')}
+          报告管理
+        </TabsTrigger>
+        <TabsTrigger value="tasks" className="flex items-center gap-2">
+          {getTabIcon('tasks')}
+          任务管理
+        </TabsTrigger>
+      </TabsList>
 
         {/* 文件上传标签页 */}
         <TabsContent value="upload" className="space-y-6">
@@ -448,6 +454,20 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
             batchJobId={currentBatchJob?.id}
             onSuccess={onSuccess}
             onError={onError}
+          />
+        </TabsContent>
+
+        {/* 任务管理标签页 */}
+        <TabsContent value="tasks" className="space-y-6">
+          <BatchJobList
+            onSuccess={onSuccess}
+            onError={onError}
+            onJobSelected={(job) => {
+              setCurrentBatchJob(job);
+              setActiveTab('process');
+              saveSessionState(job, 'process', processingMode);
+              onSuccess?.(`已恢复批量任务: ${job.name}`);
+            }}
           />
         </TabsContent>
       </Tabs>

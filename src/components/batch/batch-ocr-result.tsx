@@ -298,8 +298,21 @@ export function BatchOCRResult({
         console.log('重新识别响应:', response.data);
         
         // 检查返回结果
-        if (response.data.status === 'completed' && response.data.result?.ocr_result_id) {
-          // 获取完整的OCR结果
+        if (response.status === 202 && response.data.status === 'processing') {
+          // 后端已接受请求，开始后台处理
+          console.log('重新识别已在后台启动');
+          onSuccess?.(`重新识别已启动: ${fileItem.filename}，正在后台处理...`);
+          
+          // 不再使用轮询，直接告诉用户刷新页面查看结果
+          setTimeout(() => {
+            setIsProcessingOCR(false);
+            onSuccess?.('重新识别正在处理中，请刷新页面查看最新结果');
+            // 触发批量任务刷新
+            onRefetch?.();
+          }, 3000);
+          
+        } else if (response.data.status === 'completed' && response.data.result?.ocr_result_id) {
+          // 立即完成的情况
           try {
             const ocrResponse = await ocrApi.getResult(response.data.result.ocr_result_id);
             console.log('获取到新的OCR结果:', ocrResponse.data);
@@ -314,16 +327,18 @@ export function BatchOCRResult({
           } catch (ocrError) {
             console.error('获取OCR结果失败:', ocrError);
             onError?.('获取识别结果失败: ' + formatError(ocrError));
+          } finally {
+            setIsProcessingOCR(false);
           }
         } else {
+          setIsProcessingOCR(false);
           onError?.('重新识别失败: 未获取到有效结果');
         }
 
       } catch (error) {
         console.error('重新识别失败:', error);
-        onError?.('重新识别失败: ' + formatError(error));
-      } finally {
         setIsProcessingOCR(false);
+        onError?.('重新识别失败: ' + formatError(error));
       }
       return;
     }

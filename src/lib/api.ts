@@ -381,6 +381,32 @@ export const batchApi = {
   reprocessFile: (jobId: number, fileItemId: number) =>
     api.post(`/batch/jobs/${jobId}/reprocess_file/${fileItemId}/`),
 
+  // 删除批量任务 - 修复路由问题（不带斜杠）
+  deleteJob: (jobId: number) => {
+    // 获取后端URL
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.176.1:8000/api/v1';
+    
+    // 创建专门的axios实例用于删除操作
+    const deleteApi = axios.create({
+      baseURL: backendUrl,
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    // 添加认证头
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        deleteApi.defaults.headers.Authorization = `Token ${token}`;
+      }
+    }
+    
+    // 不带斜杠的URL，匹配后端路由配置
+    return deleteApi.delete(`/batch/jobs/${jobId}`);
+  },
+
   // 轮询任务状态（用于实时更新）
   pollJobStatus: (id: number) => api.get(`/batch/jobs/${id}/progress/`),
 

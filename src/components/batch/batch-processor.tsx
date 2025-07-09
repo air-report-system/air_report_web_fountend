@@ -23,11 +23,14 @@ import {
   FileText,
   Download,
   SkipForward,
-  Settings
+  Settings,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { batchApi, BatchJob, BatchFileItem } from '@/lib/api';
 import { AxiosError } from 'axios';
 import { formatError, formatDateTime, formatFileSize } from '@/lib/utils';
+import { useBatchWebSocket, BatchProgressUpdate, FileProcessingUpdate } from '@/lib/websocket';
 
 interface BatchProcessorProps {
   onSuccess?: (message: string) => void;
@@ -40,11 +43,34 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
   const [batchName, setBatchName] = useState('');
   const [useMultiOcr, setUseMultiOcr] = useState(false);
   const [ocrCount, setOcrCount] = useState(3);
+  const [autoStart, setAutoStart] = useState(true); // 默认自动启动
   const [currentBatchJob, setCurrentBatchJob] = useState<BatchJob | null>(null);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const queryClient = useQueryClient();
+
+  // WebSocket实时通信
+  const { isConnected, sendMessage, disconnect } = useBatchWebSocket(
+    currentBatchJob?.id || null,
+    (progress: BatchProgressUpdate) => {
+      // 处理进度更新
+      if (currentBatchJob && progress.batch_job_id === currentBatchJob.id) {
+        setCurrentBatchJob(prev => prev ? {
+          ...prev,
+          progress_percentage: progress.progress_percentage,
+          processed_files: progress.processed_files,
+          failed_files: progress.failed_files,
+          status: progress.status as 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+        } : prev);
+      }
+    },
+    (fileUpdate: FileProcessingUpdate) => {
+      // 处理文件更新
+      console.log('文件处理更新:', fileUpdate);
+      // 这里可以添加文件状态更新逻辑
+    }
+  );
 
   // 创建批量任务（解耦模式）
   const createBatchMutation = useMutation({
@@ -69,13 +95,20 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
 
       if (totalFiles > actualFiles) {
         const duplicateCount = totalFiles - actualFiles;
-        onSuccess?.(`批量任务创建成功！检测到 ${duplicateCount} 个重复文件已自动跳过，实际处理 ${actualFiles} 个文件。请点击"开始处理"按钮启动OCR处理。`);
+        onSuccess?.(`批量任务创建成功！检测到 ${duplicateCount} 个重复文件已自动跳过，实际处理 ${actualFiles} 个文件。${autoStart ? '正在自动启动OCR处理...' : '请点击"开始处理"按钮启动OCR处理。'}`);
       } else {
-        onSuccess?.(`批量任务创建成功！共 ${actualFiles} 个文件已上传，请点击"开始处理"按钮启动OCR处理。`);
+        onSuccess?.(`批量任务创建成功！共 ${actualFiles} 个文件已上传。${autoStart ? '正在自动启动OCR处理...' : '请点击"开始处理"按钮启动OCR处理。'}`);
       }
 
       // 通知父组件批量任务已创建
       onBatchJobCreated?.(batchJob);
+
+      // 如果启用了自动启动，立即启动OCR处理
+      if (autoStart) {
+        setTimeout(() => {
+          startProcessingMutation.mutate(batchJob.id);
+        }, 500); // 短暂延迟，确保UI更新完成
+      }
 
       // 重置表单
       setFiles([]);
@@ -93,20 +126,26 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
     },
   });
 
-  // 获取批量任务详情
+  // 获取批量任务详情 - 仅在WebSocket未连接时使用轮询
   const { data: batchJobData, refetch: refetchBatchJob } = useQuery({
     queryKey: ['batchJob', currentBatchJob?.id],
     queryFn: () => currentBatchJob ? batchApi.getJob(currentBatchJob.id) : null,
-    enabled: !!currentBatchJob,
-    refetchInterval: currentBatchJob?.status === 'running' ? 2000 : false,
+    enabled: !!currentBatchJob && !isConnected, // 只有在WebSocket未连接时才轮询
+    refetchInterval: currentBatchJob?.status === 'running' && !isConnected ? 3000 : false,
   });
 
-  // 更新当前批量任务数据
+  // 更新当前批量任务数据（仅在非WebSocket更新时）
   useEffect(() => {
-    if (batchJobData?.data) {
-      setCurrentBatchJob(batchJobData.data);
+    if (batchJobData?.data && !isConnected) {
+      const newBatchJob = batchJobData.data;
+      setCurrentBatchJob(newBatchJob);
+      
+      // 如果任务完成，显示成功消息
+      if (newBatchJob.status === 'completed' && currentBatchJob?.status === 'running') {
+        onSuccess?.(`批量任务 "${newBatchJob.name}" 已完成！成功处理 ${newBatchJob.processed_files - newBatchJob.failed_files} 个文件`);
+      }
     }
-  }, [batchJobData]);
+  }, [batchJobData, currentBatchJob?.status, onSuccess, isConnected]);
 
   // 启动批量任务处理
   const startProcessingMutation = useMutation({
@@ -274,6 +313,19 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
                       <div className="flex items-center space-x-2">
                         <input
                           type="checkbox"
+                          id="autoStart"
+                          checked={autoStart}
+                          onChange={(e) => setAutoStart(e.target.checked)}
+                          disabled={isLoading}
+                        />
+                        <label htmlFor="autoStart" className="text-sm">
+                          自动启动OCR处理（推荐）
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
                           id="useMultiOcr"
                           checked={useMultiOcr}
                           onChange={(e) => setUseMultiOcr(e.target.checked)}
@@ -331,6 +383,18 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
                 {currentBatchJob.name}
+                {/* WebSocket连接状态指示器 */}
+                {isConnected ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Wifi className="h-3 w-3 mr-1" />
+                    实时连接
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                    <WifiOff className="h-3 w-3 mr-1" />
+                    轮询模式
+                  </Badge>
+                )}
               </div>
               <Badge className={getStatusColor(currentBatchJob.status)}>
                 {getStatusText(currentBatchJob.status)}
