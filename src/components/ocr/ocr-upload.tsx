@@ -13,6 +13,7 @@ import { Settings, Play, RotateCcw } from 'lucide-react';
 import { ocrApi } from '@/lib/api';
 import { queryKeys } from '@/lib/query-client';
 import { formatError } from '@/lib/utils';
+import { OCRStatusIndicator } from './ocr-status-indicator';
 
 interface OCRUploadProps {
   onSuccess?: (result: any) => void;
@@ -27,6 +28,8 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [pollingOcrId, setPollingOcrId] = useState<number | null>(null);
   const [pollingStatus, setPollingStatus] = useState<string>('');
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const [processingSuccess, setProcessingSuccess] = useState(false);
 
   const queryClient = useQueryClient();
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -82,6 +85,10 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
     mutationFn: ({ file, useMultiOcr, ocrCount }: { file: File; useMultiOcr: boolean; ocrCount: number }) =>
       ocrApi.uploadAndProcess(file, useMultiOcr, ocrCount),
     onSuccess: (data) => {
+      // 清除错误状态，设置成功状态
+      setProcessingError(null);
+      setProcessingSuccess(true);
+
       // 刷新OCR结果列表
       queryClient.invalidateQueries({ queryKey: queryKeys.ocr.results() });
 
@@ -91,11 +98,42 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
       }
 
       setFiles([]);
+
+      // 3秒后清除成功状态
+      setTimeout(() => setProcessingSuccess(false), 3000);
     },
-    onError: (error) => {
-      const errorMessage = formatError(error);
+    onError: (error: any) => {
+      let errorMessage = formatError(error);
+
+      // 针对特定错误类型提供更友好的提示
+      if (error.code === 'ECONNRESET' || error.message?.includes('socket hang up')) {
+        errorMessage = 'OCR处理时间较长，连接被重置。请稍后查看处理结果，或重新尝试。';
+      } else if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
+        errorMessage = 'OCR处理超时。AI处理可能需要较长时间，请稍后查看结果列表。';
+      } else if (error.response?.status === 500) {
+        errorMessage = '服务器处理出错。OCR处理可能仍在后台进行，请稍后查看结果列表。';
+      }
+
+      // 设置错误状态，清除成功状态
+      setProcessingError(errorMessage);
+      setProcessingSuccess(false);
+
       onError?.(errorMessage);
     },
+    retry: (failureCount, error: any) => {
+      // 对于连接重置和超时错误，最多重试1次
+      if (
+        failureCount < 1 &&
+        (error.code === 'ECONNRESET' ||
+         error.code === 'ETIMEDOUT' ||
+         error.message?.includes('socket hang up') ||
+         error.message?.includes('timeout'))
+      ) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: 5000, // 重试前等待5秒
   });
 
   // OCR测试mutation
@@ -105,10 +143,34 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
     onSuccess: (data) => {
       onSuccess?.(data.data);
     },
-    onError: (error) => {
-      const errorMessage = formatError(error);
+    onError: (error: any) => {
+      let errorMessage = formatError(error);
+
+      // 针对特定错误类型提供更友好的提示
+      if (error.code === 'ECONNRESET' || error.message?.includes('socket hang up')) {
+        errorMessage = 'OCR测试时间较长，连接被重置。请重新尝试或使用正式处理功能。';
+      } else if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
+        errorMessage = 'OCR测试超时。AI处理可能需要较长时间，请重新尝试。';
+      } else if (error.response?.status === 500) {
+        errorMessage = '服务器处理出错。请检查图片格式或重新尝试。';
+      }
+
       onError?.(errorMessage);
     },
+    retry: (failureCount, error: any) => {
+      // 对于连接重置和超时错误，最多重试1次
+      if (
+        failureCount < 1 &&
+        (error.code === 'ECONNRESET' ||
+         error.code === 'ETIMEDOUT' ||
+         error.message?.includes('socket hang up') ||
+         error.message?.includes('timeout'))
+      ) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: 3000, // 测试重试前等待3秒
   });
 
   const handleProcess = () => {
@@ -116,6 +178,10 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
       onError?.('请先选择图片文件');
       return;
     }
+
+    // 清除之前的状态
+    setProcessingError(null);
+    setProcessingSuccess(false);
 
     const file = files[0];
     ocrMutation.mutate({ file, useMultiOcr, ocrCount });
@@ -216,6 +282,14 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
             </div>
           )}
         </div>
+
+        {/* OCR状态指示器 */}
+        <OCRStatusIndicator
+          isProcessing={isLoading}
+          isRetrying={ocrMutation.isError && ocrMutation.failureCount > 0}
+          error={processingError}
+          success={processingSuccess}
+        />
 
         {/* 轮询状态显示 */}
         {pollingOcrId && (

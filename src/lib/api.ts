@@ -12,7 +12,7 @@ export function getApiBaseUrl(): string {
 // 创建axios实例
 const api = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 120000, // 增加到2分钟，因为AI处理可能需要更长时间
+  timeout: 300000, // 增加到5分钟，因为AI处理可能需要更长时间
   headers: {
     'Content-Type': 'application/json',
   },
@@ -168,6 +168,59 @@ export interface BatchJob {
   estimated_completion?: string;
 }
 
+// 创建专门用于OCR的axios实例，支持更长的超时和重试
+const ocrApi_instance = axios.create({
+  baseURL: getApiBaseUrl(),
+  timeout: 600000, // 10分钟超时，专门用于OCR处理
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 为OCR实例添加请求拦截器
+ocrApi_instance.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Token ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// 为OCR实例添加响应拦截器，包含重试逻辑
+ocrApi_instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+
+    // 如果是连接重置或超时错误，且没有重试过，则重试一次
+    if (
+      (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' || error.message?.includes('socket hang up')) &&
+      !config._retry
+    ) {
+      config._retry = true;
+      console.log('OCR请求失败，正在重试...', error.message);
+
+      // 等待3秒后重试
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      return ocrApi_instance(config);
+    }
+
+    // 处理401错误
+    if (typeof window !== 'undefined' && error.response?.status === 401) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 // OCR相关API
 export const ocrApi = {
   // 上传图片并开始OCR处理
@@ -177,7 +230,7 @@ export const ocrApi = {
     formData.append('use_multi_ocr', useMultiOcr.toString());
     formData.append('ocr_count', ocrCount.toString());
 
-    return api.post('/ocr/upload-and-process/', formData, {
+    return ocrApi_instance.post('/ocr/upload-and-process/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -192,8 +245,8 @@ export const ocrApi = {
     api.get('/ocr/results/', { params }),
 
   // 重新处理OCR
-  reprocess: (id: number, useMultiOcr = false, ocrCount = 3) => 
-    api.post(`/ocr/results/${id}/reprocess/`, {
+  reprocess: (id: number, useMultiOcr = false, ocrCount = 3) =>
+    ocrApi_instance.post(`/ocr/results/${id}/reprocess/`, {
       use_multi_ocr: useMultiOcr,
       ocr_count: ocrCount,
     }),
@@ -204,8 +257,8 @@ export const ocrApi = {
     formData.append('image', file);
     formData.append('use_multi_ocr', useMultiOcr.toString());
     formData.append('ocr_count', ocrCount.toString());
-    
-    return api.post('/ocr/test/', formData, {
+
+    return ocrApi_instance.post('/ocr/test/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

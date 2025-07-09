@@ -4,6 +4,14 @@ const nextConfig: NextConfig = {
   // 生产环境API代理配置
   async rewrites() {
     return [
+      // OCR相关API - 使用更长的超时时间
+      {
+        source: '/api/v1/ocr/:path*',
+        destination: process.env.BACKEND_URL
+          ? `${process.env.BACKEND_URL}/api/v1/ocr/:path*`
+          : 'http://localhost:8000/api/v1/ocr/:path*',
+      },
+      // 其他API
       {
         source: '/api/v1/:path*',
         destination: process.env.BACKEND_URL
