@@ -128,13 +128,8 @@ export function BatchOCRResult({
     if (fileItem.ocr_result) {
       setOcrResult(fileItem.ocr_result);
     } else {
-      // 如果没有OCR结果，添加默认点位
-      setPointsData({
-        '客厅': 0,
-        '主卧': 0,
-        '次卧': 0,
-        '书房': 0
-      });
+      // 如果没有OCR结果，点位数据为空
+      setPointsData({});
     }
   }, [fileItem.ocr_result]);
 
