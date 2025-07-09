@@ -191,27 +191,18 @@ export function BatchStepProcessor({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* 整体进度 */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>报告生成进度</span>
-              <span>{completedReports} / {totalFiles} ({Math.round(progressPercentage)}%)</span>
-            </div>
-            <Progress value={progressPercentage} />
-
-            {/* 完成状态提示 */}
-            {allFilesProcessed && (
-              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-2 text-green-800">
-                  <CheckCircle className="h-5 w-5" />
-                  <span className="font-medium">所有文件已处理完成！</span>
-                </div>
-                <p className="text-sm text-green-700 mt-1">
-                  您可以在下方查看已生成的报告，或切换到"报告管理"页面查看所有报告。
-                </p>
+          {/* 完成状态提示 */}
+          {allFilesProcessed && (
+            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 text-green-800">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">所有文件已处理完成！</span>
               </div>
-            )}
-          </div>
+              <p className="text-sm text-green-700 mt-1">
+                您可以在下方查看已生成的报告，或切换到"报告管理"页面查看所有报告。
+              </p>
+            </div>
+          )}
 
           {/* 当前文件导航 */}
           <div className="flex items-center justify-between">
