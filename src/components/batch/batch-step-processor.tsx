@@ -299,10 +299,12 @@ export function BatchStepProcessor({
           {currentFileItem ? (
             <BatchOCRResult
               fileItem={currentFileItem}
+              batchJob={batchJob}
               onGenerateReport={handleGenerateReport}
               onSkip={handleSkipCurrent}
               onError={onError}
               onSuccess={onSuccess}
+              onRefetch={refetch}
             />
           ) : (
             <Card className="h-full flex items-center justify-center">

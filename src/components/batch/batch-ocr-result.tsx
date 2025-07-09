@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   SkipForward
 } from 'lucide-react';
-import { BatchFileItem, OCRResult, Report, reportApi, ocrApi, pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
+import { BatchFileItem, BatchJob, OCRResult, Report, reportApi, ocrApi, batchApi, pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
 import { formatError, formatDateTime } from '@/lib/utils';
 import { queryKeys } from '@/lib/query-client';
 
@@ -31,18 +31,22 @@ import { queryKeys } from '@/lib/query-client';
 
 interface BatchOCRResultProps {
   fileItem: BatchFileItem;
+  batchJob: BatchJob;
   onGenerateReport?: (reportData: Record<string, unknown>) => void;
   onSkip?: () => void;
   onError?: (error: string) => void;
   onSuccess?: (message: string) => void;
+  onRefetch?: () => void;
 }
 
 export function BatchOCRResult({
   fileItem,
+  batchJob,
   onGenerateReport,
   onSkip,
   onError,
-  onSuccess
+  onSuccess,
+  onRefetch
 }: BatchOCRResultProps) {
   // 状态管理
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
@@ -284,6 +288,47 @@ export function BatchOCRResult({
       return;
     }
 
+    // 如果已有OCR结果，说明是重新识别，使用批量处理的重新识别API
+    if (ocrResult && batchJob) {
+      try {
+        setIsProcessingOCR(true);
+        console.log('开始重新识别文件:', fileItem.filename);
+
+        const response = await batchApi.reprocessFile(batchJob.id, fileItem.id);
+        console.log('重新识别响应:', response.data);
+        
+        // 检查返回结果
+        if (response.data.status === 'completed' && response.data.result?.ocr_result_id) {
+          // 获取完整的OCR结果
+          try {
+            const ocrResponse = await ocrApi.getResult(response.data.result.ocr_result_id);
+            console.log('获取到新的OCR结果:', ocrResponse.data);
+            
+            // 更新OCR结果
+            setOcrResult(ocrResponse.data);
+            onSuccess?.(`重新识别完成: ${fileItem.filename}`);
+            
+            // 触发批量任务刷新
+            onRefetch?.();
+            
+          } catch (ocrError) {
+            console.error('获取OCR结果失败:', ocrError);
+            onError?.('获取识别结果失败: ' + formatError(ocrError));
+          }
+        } else {
+          onError?.('重新识别失败: 未获取到有效结果');
+        }
+
+      } catch (error) {
+        console.error('重新识别失败:', error);
+        onError?.('重新识别失败: ' + formatError(error));
+      } finally {
+        setIsProcessingOCR(false);
+      }
+      return;
+    }
+
+    // 首次OCR处理，使用原有逻辑
     setIsProcessingOCR(true);
     try {
       // 创建File对象用于OCR处理

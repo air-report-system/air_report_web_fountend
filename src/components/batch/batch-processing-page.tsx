@@ -3,7 +3,7 @@
  */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import {
 import { BatchProcessor } from './batch-processor';
 import { BatchStepProcessor } from './batch-step-processor';
 import { BatchReportManager } from './batch-report-manager';
-import { BatchJob } from '@/lib/api';
+import { BatchJob, batchApi } from '@/lib/api';
 
 interface BatchProcessingPageProps {
   onSuccess?: (message: string) => void;
@@ -32,25 +32,140 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
   const [currentBatchJob, setCurrentBatchJob] = useState<BatchJob | null>(null);
   const [activeTab, setActiveTab] = useState('upload');
   const [processingMode, setProcessingMode] = useState<'auto' | 'manual'>('manual');
+  const [isRestoring, setIsRestoring] = useState(true);
+
+  // 页面加载时恢复上次的任务状态
+  useEffect(() => {
+    const restoreLastSession = async () => {
+      try {
+        // 检查是否已经在恢复过程中，避免重复执行
+        if (!isRestoring) {
+          return;
+        }
+
+        // 从localStorage获取上次的任务ID和状态
+        const lastJobId = localStorage.getItem('lastBatchJobId');
+        const lastActiveTab = localStorage.getItem('lastActiveTab');
+        const lastProcessingMode = localStorage.getItem('lastProcessingMode');
+        const lastJobCompleted = localStorage.getItem('lastBatchJobCompleted');
+
+        console.log('尝试恢复会话状态:', { lastJobId, lastActiveTab, lastProcessingMode, lastJobCompleted });
+
+        if (lastJobId && lastJobCompleted !== 'true') {
+          try {
+            // 尝试恢复上次的任务
+            const jobResponse = await batchApi.getJob(parseInt(lastJobId));
+            const job = jobResponse.data;
+
+            // 只有任务未完成时才恢复
+            if (job && job.status !== 'completed') {
+              setCurrentBatchJob(job);
+              setActiveTab(lastActiveTab || 'process');
+              setProcessingMode((lastProcessingMode as 'auto' | 'manual') || 'manual');
+              console.log('✓ 恢复上次的批量处理任务:', job.name);
+
+              // 使用setTimeout避免在useEffect中直接调用onSuccess
+              setTimeout(() => {
+                onSuccess?.(`恢复上次的批量处理任务: ${job.name}`);
+              }, 100);
+            } else {
+              // 任务已完成，清理localStorage
+              console.log('任务已完成，清理会话存储');
+              clearSessionStorage();
+            }
+          } catch (apiError) {
+            console.log('API调用失败，清理会话存储:', apiError);
+            clearSessionStorage();
+          }
+        } else {
+          console.log('没有需要恢复的会话状态');
+        }
+      } catch (error) {
+        console.error('恢复会话状态时发生错误:', error);
+        // 清理无效的localStorage数据
+        clearSessionStorage();
+      } finally {
+        setIsRestoring(false);
+      }
+    };
+
+    // 只在组件首次挂载时执行一次
+    if (isRestoring) {
+      restoreLastSession();
+    }
+  }, [isRestoring]); // 只依赖isRestoring状态
+
+  // 清理会话存储
+  const clearSessionStorage = () => {
+    try {
+      localStorage.removeItem('lastBatchJobId');
+      localStorage.removeItem('lastActiveTab');
+      localStorage.removeItem('lastProcessingMode');
+      localStorage.removeItem('lastBatchJobCompleted');
+      console.log('✓ 会话存储已清理');
+    } catch (error) {
+      console.error('清理会话存储时出错:', error);
+    }
+  };
+
+  // 保存会话状态
+  const saveSessionState = (job: BatchJob, tab: string, mode: 'auto' | 'manual') => {
+    try {
+      localStorage.setItem('lastBatchJobId', job.id.toString());
+      localStorage.setItem('lastActiveTab', tab);
+      localStorage.setItem('lastProcessingMode', mode);
+      localStorage.removeItem('lastBatchJobCompleted'); // 确保未标记为完成
+      console.log('✓ 会话状态已保存:', { jobId: job.id, tab, mode });
+    } catch (error) {
+      console.error('保存会话状态时出错:', error);
+    }
+  };
 
   const handleBatchJobCreated = (batchJob: BatchJob) => {
     setCurrentBatchJob(batchJob);
-    if (processingMode === 'manual') {
-      setActiveTab('process');
-    } else {
-      setActiveTab('monitor');
-    }
+    const newTab = processingMode === 'manual' ? 'process' : 'monitor';
+    setActiveTab(newTab);
+
+    // 保存会话状态
+    saveSessionState(batchJob, newTab, processingMode);
+
     onSuccess?.(`批量任务创建成功！共 ${batchJob.total_files} 个文件，开始处理...`);
   };
 
   const handleProcessingComplete = () => {
     setActiveTab('reports');
+
+    // 更新会话状态
+    if (currentBatchJob) {
+      saveSessionState(currentBatchJob, 'reports', processingMode);
+    }
+
     onSuccess?.('批量处理已完成！');
   };
 
   const handleBackToUpload = () => {
     setCurrentBatchJob(null);
     setActiveTab('upload');
+
+    // 清理会话状态
+    clearSessionStorage();
+  };
+
+  // 标记任务完成
+  const handleMarkJobCompleted = () => {
+    if (currentBatchJob) {
+      try {
+        localStorage.setItem('lastBatchJobCompleted', 'true');
+        clearSessionStorage();
+        setCurrentBatchJob(null);
+        setActiveTab('upload');
+        console.log('✓ 任务已标记为完成');
+        onSuccess?.('任务已标记为完成，下次打开将是新的批量处理页面');
+      } catch (error) {
+        console.error('标记任务完成时出错:', error);
+        onError?.('标记任务完成时出错，请重试');
+      }
+    }
   };
 
   const getTabIcon = (tab: string) => {
@@ -92,6 +207,13 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
             已取消
           </Badge>
         );
+      case 'pending':
+        return (
+          <Badge className="bg-gray-500 text-white">
+            <Clock className="h-3 w-3 mr-1" />
+            待处理
+          </Badge>
+        );
       default:
         return (
           <Badge variant="outline">
@@ -100,6 +222,18 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
         );
     }
   };
+
+  // 如果正在恢复状态，显示加载提示
+  if (isRestoring) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">正在恢复上次的批量处理任务...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6">
@@ -121,21 +255,38 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
               </div>
             </div>
             {getJobStatusBadge(currentBatchJob)}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBackToUpload}
-              className="flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              新建任务
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleMarkJobCompleted}
+                className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+              >
+                <CheckCircle className="h-4 w-4" />
+                任务完成
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToUpload}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                新建任务
+              </Button>
+            </div>
           </div>
         )}
       </div>
 
       {/* 主要内容区域 */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={(newTab) => {
+        setActiveTab(newTab);
+        // 保存Tab状态
+        if (currentBatchJob) {
+          saveSessionState(currentBatchJob, newTab, processingMode);
+        }
+      }} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="upload" className="flex items-center gap-2">
             {getTabIcon('upload')}

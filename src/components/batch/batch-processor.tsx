@@ -46,19 +46,17 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
 
   const queryClient = useQueryClient();
 
-  // 创建批量任务
+  // 创建批量任务（解耦模式）
   const createBatchMutation = useMutation({
     mutationFn: (data: {
       files: File[];
       batch_name: string;
       use_multi_ocr: boolean;
       ocr_count: number;
-      auto_start: boolean;
     }) => batchApi.uploadAndCreateJob(data.files, {
       batch_name: data.batch_name,
       use_multi_ocr: data.use_multi_ocr,
       ocr_count: data.ocr_count,
-      auto_start: data.auto_start,
     }),
     onSuccess: (response) => {
       const batchJob = response.data;
@@ -71,13 +69,17 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
 
       if (totalFiles > actualFiles) {
         const duplicateCount = totalFiles - actualFiles;
-        onSuccess?.(`批量任务创建成功！检测到 ${duplicateCount} 个重复文件已自动跳过，实际处理 ${actualFiles} 个文件。`);
+        onSuccess?.(`批量任务创建成功！检测到 ${duplicateCount} 个重复文件已自动跳过，实际处理 ${actualFiles} 个文件。请点击"开始处理"按钮启动OCR处理。`);
       } else {
-        onSuccess?.('批量任务创建成功，开始处理...');
+        onSuccess?.(`批量任务创建成功！共 ${actualFiles} 个文件已上传，请点击"开始处理"按钮启动OCR处理。`);
       }
 
       // 通知父组件批量任务已创建
       onBatchJobCreated?.(batchJob);
+
+      // 重置表单
+      setFiles([]);
+      setBatchName('');
     },
     onError: (error: AxiosError | Error) => {
       console.error('批量上传错误:', error);
@@ -106,16 +108,22 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
     }
   }, [batchJobData]);
 
-  // 启动批量任务
-  const startBatchMutation = useMutation({
+  // 启动批量任务处理
+  const startProcessingMutation = useMutation({
     mutationFn: (jobId: number) => batchApi.startJob(jobId),
-    onSuccess: () => {
-      onSuccess?.('批量任务已启动');
-      refetchBatchJob();
+    onSuccess: (response) => {
+      onSuccess?.('批量处理已在后台启动，请通过进度监控查看处理状态');
+      // 刷新当前任务状态
+      if (currentBatchJob) {
+        setCurrentBatchJob({
+          ...currentBatchJob,
+          status: 'running'
+        });
+      }
     },
     onError: (error) => {
-      const errorMessage = formatError(error);
-      onError?.(errorMessage);
+      console.error('启动批量处理错误:', error);
+      onError?.(error instanceof Error ? error.message : '启动批量处理失败');
     },
   });
 
@@ -157,13 +165,19 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
       return;
     }
 
+    // 解耦模式：先上传文件创建任务，不自动启动处理
     createBatchMutation.mutate({
       files,
       batch_name: batchName.trim(),
       use_multi_ocr: useMultiOcr,
       ocr_count: ocrCount,
-      auto_start: true,
     });
+  };
+
+  const handleStartProcessing = () => {
+    if (currentBatchJob) {
+      startProcessingMutation.mutate(currentBatchJob.id);
+    }
   };
 
   const handleCancelBatch = () => {
@@ -201,8 +215,8 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
     }
   };
 
-  const isLoading = createBatchMutation.isPending || 
-                   startBatchMutation.isPending || 
+  const isLoading = createBatchMutation.isPending ||
+                   startProcessingMutation.isPending ||
                    cancelBatchMutation.isPending;
 
   return (
@@ -299,8 +313,8 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
                     disabled={isLoading || !batchName.trim()}
                     className="flex items-center gap-2"
                   >
-                    <Play className="h-4 w-4" />
-                    开始批量处理
+                    <Upload className="h-4 w-4" />
+                    上传文件
                   </Button>
                 </div>
               </div>
@@ -336,6 +350,17 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
             </div>
 
             <div className="flex items-center gap-2">
+              {currentBatchJob.status === 'pending' && (
+                <Button
+                  onClick={handleStartProcessing}
+                  disabled={startProcessingMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Play className="h-4 w-4" />
+                  {startProcessingMutation.isPending ? '启动中...' : '开始处理'}
+                </Button>
+              )}
+
               {currentBatchJob.status === 'running' && (
                 <Button
                   variant="outline"

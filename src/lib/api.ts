@@ -149,7 +149,7 @@ export interface BatchFileItem {
 export interface BatchJob {
   id: number;
   name: string;
-  status: 'created' | 'running' | 'completed' | 'failed' | 'cancelled';
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
   total_files: number;
   processed_files: number;
   failed_files: number;
@@ -326,12 +326,11 @@ export const batchApi = {
     auto_start?: boolean;
   }) => api.post('/batch/jobs/', data),
 
-  // 批量上传文件并创建任务
+  // 批量上传文件并创建任务（解耦模式：仅上传，不自动处理）
   uploadAndCreateJob: (files: File[], options: {
     batch_name: string;
     use_multi_ocr?: boolean;
     ocr_count?: number;
-    auto_start?: boolean;
   }) => {
     const formData = new FormData();
     files.forEach((file) => {
@@ -340,7 +339,8 @@ export const batchApi = {
     formData.append('batch_name', options.batch_name);
     formData.append('use_multi_ocr', (options.use_multi_ocr || false).toString());
     formData.append('ocr_count', (options.ocr_count || 3).toString());
-    formData.append('auto_start', (options.auto_start || true).toString());
+    // 解耦模式：不自动启动，让前端控制
+    formData.append('auto_start', 'false');
 
     return api.post('/batch/create/', formData, {
       headers: {
@@ -348,6 +348,11 @@ export const batchApi = {
       },
     });
   },
+
+  // 启动批量任务处理
+  startJob: (jobId: number, options?: {
+    force_restart?: boolean;
+  }) => api.post(`/batch/jobs/${jobId}/start/`, options || {}),
 
   // 获取批量任务列表
   getJobs: (params?: {
@@ -359,14 +364,25 @@ export const batchApi = {
   // 获取批量任务详情
   getJob: (id: number) => api.get<BatchJob>(`/batch/jobs/${id}/`),
 
-  // 启动批量任务
-  startJob: (id: number) => api.post(`/batch/jobs/${id}/start/`),
-
   // 取消批量任务
   cancelJob: (id: number) => api.post(`/batch/jobs/${id}/cancel/`),
 
+  // 获取任务进度（包含详细文件信息）
+  getProgress: (id: number) => api.get(`/batch/jobs/${id}/progress/`),
+
+  // 获取单个文件项详情
+  getFileItem: (jobId: number, fileItemId: number) =>
+    api.get(`/batch/jobs/${jobId}/files/${fileItemId}/`),
+
   // 重试失败的文件项
   retryFailedItems: (jobId: number) => api.post(`/batch/jobs/${jobId}/retry-failed/`),
+
+  // 重新识别指定文件
+  reprocessFile: (jobId: number, fileItemId: number) =>
+    api.post(`/batch/jobs/${jobId}/reprocess_file/${fileItemId}/`),
+
+  // 轮询任务状态（用于实时更新）
+  pollJobStatus: (id: number) => api.get(`/batch/jobs/${id}/progress/`),
 
   // 获取批量任务统计
   getStats: () => api.get('/batch/stats/'),
