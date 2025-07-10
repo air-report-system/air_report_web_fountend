@@ -141,52 +141,53 @@ export function BatchOCRResult({
       // 填充基本信息
       setFormData(prev => {
         // 确保check_type是有效值
-        const validCheckType = (ocrResult.check_type === 'initial' || ocrResult.check_type === 'recheck')
-          ? ocrResult.check_type
-          : prev.check_type;
+        let validCheckType: 'initial' | 'recheck' = 'initial';
+        if (ocrResult.check_type === 'initial' || ocrResult.check_type === 'recheck') {
+          validCheckType = ocrResult.check_type;
+        }
+
+        // 格式化联系人信息
+        const contactName = ocrResult.contact_info?.contact_name || '';
+        const contactPhone = ocrResult.contact_info?.full_phone || ocrResult.phone || '';
+        
+        let contactDisplay = '';
+        if (contactName && contactPhone) {
+            contactDisplay = `${contactName} ${contactPhone}`;
+        } else if (contactName) {
+            contactDisplay = contactName;
+        } else if (contactPhone) {
+            contactDisplay = contactPhone;
+        }
 
         const newFormData = {
-          ...prev,
-          sampling_date: ocrResult.date || prev.sampling_date,
+          title: '', // 每次都重置标题
+          sampling_date: ocrResult.date || '',
           check_type: validCheckType,
-          temperature: ocrResult.temperature?.toString() || prev.temperature,
-          humidity: ocrResult.humidity?.toString() || prev.humidity,
-          contact_person: ocrResult.contact_info?.contact_name || prev.contact_person,
-          project_address: ocrResult.contact_info?.address || prev.project_address,
+          temperature: ocrResult.temperature?.toString() || '',
+          humidity: ocrResult.humidity?.toString() || '',
+          contact_person: contactDisplay.trim(),
+          project_address: ocrResult.contact_info?.address || '',
+          notes: ''
         };
 
         // 自动生成报告标题
-        if (!prev.title) {
-          const contactName = ocrResult.contact_info?.contact_name || '';
-          const address = ocrResult.contact_info?.address || '';
-          const checkTypeText = ocrResult.check_type === 'recheck' ? '复检' : '初检';
-          const date = ocrResult.date || '';
+        const address = ocrResult.contact_info?.address || '';
+        const checkTypeText = newFormData.check_type === 'recheck' ? '复检' : '初检';
+        const date = ocrResult.date || '';
 
-          // 简化地址显示
-          let shortAddress = '';
-          if (address) {
-            const addressMatch = address.match(/([\u4e00-\u9fa5]+(?:小区|花园|公寓|大厦|新居|家园|苑|庭|城|广场))/);
-            if (addressMatch) {
-              shortAddress = addressMatch[1];
-            } else {
-              shortAddress = address.substring(0, 15);
-            }
-          }
-
-          // 生成标题
-          if (shortAddress && date) {
-            newFormData.title = `${shortAddress}+${checkTypeText}报告+${date}`;
-          } else if (contactName && date) {
-            newFormData.title = `${contactName}+${checkTypeText}报告+${date}`;
-          } else if (shortAddress) {
-            newFormData.title = `${shortAddress}+${checkTypeText}报告`;
-          } else if (contactName) {
-            newFormData.title = `${contactName}+${checkTypeText}报告`;
-          } else {
-            newFormData.title = `室内空气质量${checkTypeText}报告`;
-          }
+        // Title generation using the full address
+        if (address && date) {
+          newFormData.title = `${address}+${checkTypeText}报告+${date}`;
+        } else if (contactName && date) {
+          newFormData.title = `${contactName}+${checkTypeText}报告+${date}`;
+        } else if (address) {
+          newFormData.title = `${address}+${checkTypeText}报告`;
+        } else if (contactName) {
+          newFormData.title = `${contactName}+${checkTypeText}报告`;
+        } else {
+          newFormData.title = `室内空气质量${checkTypeText}报告`;
         }
-
+        
         return newFormData;
       });
 
@@ -504,6 +505,8 @@ export function BatchOCRResult({
                     {ocrResult.contact_info.contact_name && (
                       <div>联系人: {ocrResult.contact_info.contact_name}</div>
                     )}
+                    {/* 诊断信息：显示后端返回的电话号码 */}
+                    <div>电话: {ocrResult.contact_info?.full_phone || ocrResult.phone || '未识别到'}</div>
                     {ocrResult.contact_info.address && (
                       <div>地址: {ocrResult.contact_info.address}</div>
                     )}

@@ -128,55 +128,73 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
       // 填充基本信息
       setFormData(prev => {
         // 确保check_type是有效值
-        const validCheckType = (ocrResult.check_type === 'initial' || ocrResult.check_type === 'recheck')
-          ? ocrResult.check_type
-          : prev.check_type;
+        let validCheckType: 'initial' | 'recheck' = 'initial';
+        if (ocrResult.check_type === 'initial' || ocrResult.check_type === 'recheck') {
+          validCheckType = ocrResult.check_type;
+        }
+
+        // 格式化联系人信息
+        const contactName = ocrResult.contact_info?.contact_name || '';
+        const contactPhone = ocrResult.contact_info?.full_phone || ocrResult.phone || '';
+        
+        let contactDisplay = '';
+        if (contactName && contactPhone) {
+            contactDisplay = `${contactName} ${contactPhone}`;
+        } else if (contactName) {
+            contactDisplay = contactName;
+        } else if (contactPhone) {
+            contactDisplay = contactPhone;
+        }
 
         const newFormData = {
-          ...prev,
-          sampling_date: ocrResult.date || prev.sampling_date,
+          title: '', // 每次都重置标题
+          sampling_date: ocrResult.date || '',
           check_type: validCheckType,
-          temperature: ocrResult.temperature?.toString() || prev.temperature,
-          humidity: ocrResult.humidity?.toString() || prev.humidity,
-          // 如果有联系人信息，填充联系人和地址
-          contact_person: ocrResult.contact_info?.contact_name || prev.contact_person,
-          project_address: ocrResult.contact_info?.address || prev.project_address,
+          temperature: ocrResult.temperature?.toString() || '',
+          humidity: ocrResult.humidity?.toString() || '',
+          contact_person: contactDisplay.trim(),
+          project_address: ocrResult.contact_info?.address || '',
+          notes: ''
         };
 
         // 自动生成报告标题 - 参考GUI版本格式: {地址}+{检测类型}报告+{日期}
-        if (!prev.title) {
-          const contactName = ocrResult.contact_info?.contact_name || '';
-          const address = ocrResult.contact_info?.address || '';
-          const checkTypeText = ocrResult.check_type === 'recheck' ? '复检' : '初检';
-          const date = ocrResult.date || '';
+        const address = ocrResult.contact_info?.address || '';
+        const checkTypeText = newFormData.check_type === 'recheck' ? '复检' : '初检';
+        const date = ocrResult.date || '';
 
-          // 简化地址显示（取前几个关键词）
-          let shortAddress = '';
-          if (address) {
-            // 提取地址中的关键信息，如小区名称
-            const addressMatch = address.match(/([\u4e00-\u9fa5]+(?:小区|花园|公寓|大厦|新居|家园|苑|庭|城|广场))/);
-            if (addressMatch) {
-              shortAddress = addressMatch[1];
-            } else {
-              // 如果没有匹配到小区名，取地址前15个字符
-              shortAddress = address.substring(0, 15);
-            }
+        // 简化地址显示
+        let shortAddress = '';
+        if (address) {
+          const districtIndex = address.lastIndexOf('区');
+          const countyIndex = address.lastIndexOf('县');
+          const cityIndex = address.lastIndexOf('市');
+          
+          let lastIndex = Math.max(districtIndex, countyIndex);
+
+          if (lastIndex === -1 && cityIndex !== -1 && cityIndex < address.length - 1) {
+              lastIndex = cityIndex;
           }
 
-          // 生成标题
-          if (shortAddress && date) {
-            newFormData.title = `${shortAddress}+${checkTypeText}报告+${date}`;
-          } else if (contactName && date) {
-            newFormData.title = `${contactName}+${checkTypeText}报告+${date}`;
-          } else if (shortAddress) {
-            newFormData.title = `${shortAddress}+${checkTypeText}报告`;
-          } else if (contactName) {
-            newFormData.title = `${contactName}+${checkTypeText}报告`;
+          if (lastIndex !== -1) {
+            shortAddress = address.substring(lastIndex + 1).trim();
           } else {
-            newFormData.title = `室内空气质量${checkTypeText}报告`;
+            shortAddress = address.substring(0, 20);
           }
         }
 
+        // 生成标题
+        if (shortAddress && date) {
+          newFormData.title = `${shortAddress}+${checkTypeText}报告+${date}`;
+        } else if (contactName && date) {
+          newFormData.title = `${contactName}+${checkTypeText}报告+${date}`;
+        } else if (shortAddress) {
+          newFormData.title = `${shortAddress}+${checkTypeText}报告`;
+        } else if (contactName) {
+          newFormData.title = `${contactName}+${checkTypeText}报告`;
+        } else {
+          newFormData.title = `室内空气质量${checkTypeText}报告`;
+        }
+        
         return newFormData;
       });
 
@@ -347,7 +365,37 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newFormData = { ...prev, [field]: value };
+
+      // Fields that act as a source for the report title
+      const titleSourceFields = ['project_address', 'check_type', 'sampling_date', 'contact_person'];
+
+      if (titleSourceFields.includes(field)) {
+        const address = newFormData.project_address;
+        const checkTypeText = newFormData.check_type === 'recheck' ? '复检' : '初检';
+        const date = newFormData.sampling_date;
+        const contactName = newFormData.contact_person.split(' ')[0] || '';
+
+        // Title generation using the full address
+        let newTitle = '';
+        if (address && date) {
+          newTitle = `${address}+${checkTypeText}报告+${date}`;
+        } else if (contactName && date) {
+          newTitle = `${contactName}+${checkTypeText}报告+${date}`;
+        } else if (address) {
+          newTitle = `${address}+${checkTypeText}报告`;
+        } else if (contactName) {
+          newTitle = `${contactName}+${checkTypeText}报告`;
+        } else {
+          newTitle = `室内空气质量${checkTypeText}报告`;
+        }
+        
+        newFormData.title = newTitle;
+      }
+
+      return newFormData;
+    });
   };
 
   const handlePointDataChange = (pointName: string, value: string) => {

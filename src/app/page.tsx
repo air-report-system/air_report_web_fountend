@@ -13,7 +13,7 @@ import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Upload, BarChart3, Settings, ShoppingCart } from 'lucide-react';
+import { FileText, Upload, BarChart3, Settings, ShoppingCart, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { OCRResult } from '@/lib/api';
 import { VersionDisplayInline } from '@/components/ui/version-display';
 
@@ -34,6 +34,7 @@ function MainApp() {
   const [currentOcrResult, setCurrentOcrResult] = useState<OCRResult | null>(null);
   const [mounted, setMounted] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
+  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // 确保组件已挂载，避免hydration不匹配
   useEffect(() => {
@@ -100,61 +101,90 @@ function MainApp() {
         <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex gap-6">
             {/* 左侧导航栏 */}
-            <div className="w-64 flex-shrink-0">
-              <div className="bg-white rounded-lg shadow-sm border">
-                <div className="p-4 border-b">
-                  <h2 className="text-lg font-semibold text-gray-900">功能导航</h2>
+            <div
+              className={`flex-shrink-0 bg-white rounded-lg shadow-sm border transition-all duration-300 ${
+                isNavCollapsed ? 'w-20' : 'w-64'
+              }`}
+            >
+              <div className="h-full flex flex-col">
+                <div className={`p-4 border-b flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-between'}`}>
+                  {!isNavCollapsed && (
+                    <h2 className="text-lg font-semibold text-gray-900">功能导航</h2>
+                  )}
+                  <button
+                    onClick={() => setIsNavCollapsed(!isNavCollapsed)}
+                    className="p-1 rounded-md hover:bg-gray-100 text-gray-600"
+                    title={isNavCollapsed ? '展开导航' : '收起导航'}
+                  >
+                    {isNavCollapsed ? <ChevronsRight className="h-5 w-5" /> : <ChevronsLeft className="h-5 w-5" />}
+                  </button>
                 </div>
-                <nav className="p-2">
+                <nav className={`flex-grow p-2 ${isNavCollapsed ? 'space-y-2' : ''}`}>
                   <button
                     onClick={() => setActiveTab('ocr')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${activeTab === 'ocr'
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === 'ocr'
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    } ${isNavCollapsed ? 'justify-center' : ''}`}
+                    title="OCR & 报告"
                   >
-                    <FileText className="h-5 w-5" />
-                    <span className="font-medium">OCR & 报告</span>
+                    <FileText className="h-5 w-5 flex-shrink-0" />
+                    {!isNavCollapsed && (
+                      <span className="font-medium">OCR & 报告</span>
+                    )}
                   </button>
 
                   <button
                     onClick={() => setActiveTab('batch')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${activeTab === 'batch'
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === 'batch'
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    } ${isNavCollapsed ? 'justify-center' : ''}`}
+                    title="批量处理"
                   >
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">批量处理</span>
+                    <Settings className="h-5 w-5 flex-shrink-0" />
+                    {!isNavCollapsed && (
+                      <span className="font-medium">批量处理</span>
+                    )}
                   </button>
 
                   <button
                     onClick={() => setActiveTab('monthly')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${activeTab === 'monthly'
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === 'monthly'
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    } ${isNavCollapsed ? 'justify-center' : ''}`}
+                    title="月度报表"
                   >
-                    <BarChart3 className="h-5 w-5" />
-                    <span className="font-medium">月度报表</span>
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    {!isNavCollapsed && (
+                      <span className="font-medium">月度报表</span>
+                    )}
                   </button>
 
                   <button
                     onClick={() => setActiveTab('orders')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${activeTab === 'orders'
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === 'orders'
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    } ${isNavCollapsed ? 'justify-center' : ''}`}
+                    title="订单信息记录"
                   >
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="font-medium">订单信息记录</span>
+                    <ShoppingCart className="h-5 w-5 flex-shrink-0" />
+                    {!isNavCollapsed && (
+                      <span className="font-medium">订单信息记录</span>
+                    )}
                   </button>
                 </nav>
               </div>
             </div>
 
             {/* 右侧内容区域 */}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
                 {/* OCR处理和报告生成页面 */}

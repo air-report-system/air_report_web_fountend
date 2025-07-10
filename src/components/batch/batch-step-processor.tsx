@@ -289,6 +289,7 @@ export function BatchStepProcessor({
         <div className="lg:col-span-2">
           {currentFileItem ? (
             <BatchOCRResult
+              key={currentFileItem.id}
               fileItem={currentFileItem}
               batchJob={batchJob}
               onGenerateReport={handleGenerateReport}
