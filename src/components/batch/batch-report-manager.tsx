@@ -24,7 +24,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  RefreshCw, // 导入 RefreshCw 图标
+  Clock, // 导入 Clock 图标
 } from 'lucide-react';
 import { reportApi, Report } from '@/lib/api';
 import { formatError, formatDateTime, downloadFile } from '@/lib/utils';
@@ -107,6 +109,23 @@ export function BatchReportManager({
     },
   });
 
+  // 重新生成报告
+  const regenerateReportMutation = useMutation({
+    mutationFn: (reportId: number) => {
+      // 调用API，强制重新生成
+      return reportApi.generate(reportId, true);
+    },
+    onSuccess: (data, reportId) => {
+      onSuccess?.(`报告 #${reportId} 已加入重新生成队列`);
+      // 触发报告列表刷新
+      refetch();
+    },
+    onError: (error, reportId) => {
+      const errorMessage = formatError(error);
+      onError?.(`报告 #${reportId} 重新生成失败: ${errorMessage}`);
+    },
+  });
+
   const reports = reportsData?.data?.results || [];
   // 服务端已经处理了筛选和分页，不需要客户端再次过滤
 
@@ -154,6 +173,18 @@ export function BatchReportManager({
   };
 
   const getStatusBadge = (report: Report) => {
+    // 检查是否有正在进行的重新生成任务
+    const isRegenerating = regenerateReportMutation.isPending && regenerateReportMutation.variables === report.id;
+
+    if (isRegenerating) {
+      return (
+        <Badge className="bg-blue-500 text-white">
+          <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+          生成中...
+        </Badge>
+      );
+    }
+
     if (report.is_generated) {
       return (
         <Badge className="bg-green-500 text-white">
@@ -161,10 +192,18 @@ export function BatchReportManager({
           已生成
         </Badge>
       );
+    } else if (report.error_message) {
+      return (
+        <Badge variant="destructive" title={report.error_message}>
+          <AlertCircle className="h-3 w-3 mr-1" />
+          生成失败
+        </Badge>
+      );
     } else {
+      // 默认“待生成”状态，但可能被“生成中”覆盖
       return (
         <Badge variant="outline">
-          <AlertCircle className="h-3 w-3 mr-1" />
+          <Clock className="h-3 w-3 mr-1" />
           待生成
         </Badge>
       );
@@ -464,7 +503,17 @@ export function BatchReportManager({
                       </Button>
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-400">待生成</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => regenerateReportMutation.mutate(report.id)}
+                      disabled={regenerateReportMutation.isPending}
+                      className="flex items-center gap-1 h-8 text-xs px-2"
+                      title="重新生成报告"
+                    >
+                      <RefreshCw className={`h-3 w-3 ${regenerateReportMutation.isPending && regenerateReportMutation.variables === report.id ? 'animate-spin' : ''}`} />
+                      生成
+                    </Button>
                   )}
                 </div>
               </div>
