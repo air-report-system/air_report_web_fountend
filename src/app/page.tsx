@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Upload, BarChart3, Settings, ShoppingCart } from 'lucide-react';
 import { OCRResult } from '@/lib/api';
+import { VersionDisplayInline } from '@/components/ui/version-display';
 
 // 创建QueryClient实例
 const queryClient = new QueryClient({
@@ -79,9 +80,7 @@ function MainApp() {
                 </h1>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-gray-500">
-                  Web版本 v1.0
-                </div>
+                <VersionDisplayInline />
                 <UserMenu />
               </div>
             </div>
