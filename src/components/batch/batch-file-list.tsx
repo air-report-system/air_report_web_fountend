@@ -15,11 +15,10 @@ import {
   RefreshCw,
   FileText,
   Download,
-  Eye,
   SkipForward
 } from 'lucide-react';
 import { BatchFileItem } from '@/lib/api';
-import { formatFileSize, formatDateTime } from '@/lib/utils';
+import { formatFileSize } from '@/lib/utils';
 
 interface BatchFileListProps {
   fileItems: BatchFileItem[];
@@ -127,7 +126,7 @@ export function BatchFileList({
       </CardHeader>
       
       <CardContent className="p-0">
-        <div className="max-h-96 overflow-y-auto">
+        <div className="h-full max-h-[calc(100vh-400px)] overflow-y-auto">
           {fileItems.map((fileItem, index) => (
             <div
               key={fileItem.id}
