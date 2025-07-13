@@ -456,10 +456,8 @@ export function BatchReportManager({
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
                         {report.form_data.contact_person}
+                        {report.form_data?.phone && ` ${report.form_data.phone}`}
                       </div>
-                    )}
-                    {report.form_data?.phone && (
-                      <div>{report.form_data.phone}</div>
                     )}
                     {report.form_data?.project_address && (
                       <div className="truncate">{report.form_data.project_address}</div>
