@@ -422,6 +422,29 @@ export function formatError(error: any): string {
 }
 
 /**
+ * 格式化数值为3位小数
+ * 确保始终显示3位小数，如 0.050
+ */
+export function formatToThreeDecimals(value: number | string): string {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(numValue)) {
+    return '0.000';
+  }
+  return numValue.toFixed(3);
+}
+
+/**
+ * 解析输入值为数字，保持3位小数格式
+ */
+export function parseToThreeDecimals(value: string): string {
+  const numValue = parseFloat(value);
+  if (isNaN(numValue)) {
+    return '0.000';
+  }
+  return numValue.toFixed(3);
+}
+
+/**
  * 获取API基础URL - 支持开发和生产环境
  */
 export function getApiBaseUrl(): string {

@@ -24,7 +24,7 @@ import {
 import { OCRResult } from '@/lib/api';
 import { ocrApi } from '@/lib/api';
 import { queryKeys } from '@/lib/query-client';
-import { formatDateTime, formatError } from '@/lib/utils';
+import { formatDateTime, formatError, formatToThreeDecimals } from '@/lib/utils';
 
 interface OCRResultProps {
   result: OCRResult;
@@ -195,7 +195,7 @@ export function OCRResultDisplay({ result, onReprocess, onCreateReport }: OCRRes
                   <div key={point} className="p-3 bg-gray-50 rounded-lg">
                     <div className="font-medium text-sm text-gray-900">{point}</div>
                     <div className="text-lg font-semibold text-blue-600">
-                      {typeof value === 'number' ? value.toFixed(3) : value} mg/m³
+                      {typeof value === 'number' ? formatToThreeDecimals(value) : value} mg/m³
                     </div>
                     <div className="text-xs text-gray-500">
                       {typeof value === 'number' && value > 0.08 ? '超标' : '合格'}
