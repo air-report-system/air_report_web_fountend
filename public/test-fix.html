@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Name Display Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .report-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .report-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .report-title {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .report-details {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .icon {
+            width: 12px;
+            height: 12px;
+        }
+        .before {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+        }
+        .after {
+            background-color: #dcfce7;
+            border-color: #86efac;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <h1>客户姓名显示修复测试</h1>
+    
+    <div class="section-title">修复前 (问题): 只显示电话号码，没有客户姓名</div>
+    <div class="card before">
+        <div class="report-row">
+            <div class="report-info">
+                <div class="report-title">成都市高新区天府一街1339号街道名称号13-406＋初检报告+2025-07-10</div>
+                <div class="report-details">
+                    <!-- 没有客户姓名显示 -->
+                    <div>13388095580</div>
+                    <div>成都市高新区天府一街1339号街道名称号13-406</div>
+                </div>
+            </div>
+        </div>
+        <div class="report-row">
+            <div class="report-info">
+                <div class="report-title">四川省成都市成华区建设南路26号 蓝调V春东区2栋1单元07号＋初检报告+2025-07-12</div>
+                <div class="report-details">
+                    <!-- 没有客户姓名显示 -->
+                    <div>13388095580</div>
+                    <div>四川省成都市成华区建设南路26号 蓝调V春东区2栋1单元07号</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">修复后 (解决方案): 显示客户姓名和电话号码</div>
+    <div class="card after">
+        <div class="report-row">
+            <div class="report-info">
+                <div class="report-title">成都市高新区天府一街1339号街道名称号13-406＋初检报告+2025-07-10</div>
+                <div class="report-details">
+                    <div class="customer-info">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                        张三 13388095580
+                    </div>
+                    <div>成都市高新区天府一街1339号街道名称号13-406</div>
+                </div>
+            </div>
+        </div>
+        <div class="report-row">
+            <div class="report-info">
+                <div class="report-title">四川省成都市成华区建设南路26号 蓝调V春东区2栋1单元07号＋初检报告+2025-07-12</div>
+                <div class="report-details">
+                    <div class="customer-info">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                        李四 13882623739
+                    </div>
+                    <div>四川省成都市成华区建设南路26号 蓝调V春东区2栋1单元07号</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">技术说明</div>
+    <div class="card">
+        <h3>问题原因:</h3>
+        <p>字段名称不匹配 - 报告生成时使用 <code>contact_person</code> 字段存储客户姓名，但报告管理界面查找的是 <code>contact_name</code> 字段。</p>
+        
+        <h3>解决方案:</h3>
+        <p>将 <code>batch-report-manager.tsx</code> 中的 <code>report.form_data?.contact_name</code> 修改为 <code>report.form_data?.contact_person</code>，确保字段名称一致。</p>
+        
+        <h3>改动范围:</h3>
+        <ul>
+            <li>文件: <code>src/components/batch/batch-report-manager.tsx</code></li>
+            <li>修改: 2行代码</li>
+            <li>影响: 报告管理列表现在会正确显示客户姓名</li>
+        </ul>
+    </div>
+</body>
+</html>
