@@ -24,7 +24,7 @@ import {
   SkipForward
 } from 'lucide-react';
 import { BatchFileItem, BatchJob, OCRResult, Report, reportApi, ocrApi, batchApi, pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
-import { formatError, formatDateTime } from '@/lib/utils';
+import { formatError, formatDateTime, formatToThreeDecimals, parseToThreeDecimals } from '@/lib/utils';
 import { queryKeys } from '@/lib/query-client';
 
 
@@ -61,7 +61,7 @@ export function BatchOCRResult({
     humidity: '',
     notes: ''
   });
-  const [pointsData, setPointsData] = useState<Record<string, number>>({});
+  const [pointsData, setPointsData] = useState<Record<string, string>>({});
   const [inferredCheckType, setInferredCheckType] = useState<'initial' | 'recheck' | null>(null);
   const [checkTypeConfidence, setCheckTypeConfidence] = useState<number>(0);
   const [createdReport, setCreatedReport] = useState<Report | null>(null);
@@ -193,7 +193,12 @@ export function BatchOCRResult({
 
       // 填充点位数据
       if (ocrResult.points_data && Object.keys(ocrResult.points_data).length > 0) {
-        setPointsData(ocrResult.points_data);
+        // 将数字转换为3位小数格式的字符串
+        const formattedPointsData: Record<string, string> = {};
+        Object.entries(ocrResult.points_data).forEach(([key, value]) => {
+          formattedPointsData[key] = formatToThreeDecimals(value);
+        });
+        setPointsData(formattedPointsData);
       }
     }
   }, [ocrResult]);
@@ -226,8 +231,14 @@ export function BatchOCRResult({
 
   // 检测类型推断mutation
   const inferCheckTypeMutation = useMutation({
-    mutationFn: (pointsData: Record<string, number>) =>
-      checkTypeInferenceApi.infer({ points_data: pointsData }),
+    mutationFn: (pointsData: Record<string, string>) => {
+      // 将字符串转换为数字进行推断
+      const numericPointsData: Record<string, number> = {};
+      Object.entries(pointsData).forEach(([key, value]) => {
+        numericPointsData[key] = parseFloat(value) || 0;
+      });
+      return checkTypeInferenceApi.infer({ points_data: numericPointsData });
+    },
     onSuccess: (data) => {
       setInferredCheckType(data.data.predicted_type);
       setCheckTypeConfidence(data.data.confidence);
@@ -240,8 +251,13 @@ export function BatchOCRResult({
   // 点位学习更新
   const updatePointLearning = () => {
     if (Object.keys(pointsData).length > 0) {
+      // 将字符串转换为数字进行学习
+      const numericPointsData: Record<string, number> = {};
+      Object.entries(pointsData).forEach(([key, value]) => {
+        numericPointsData[key] = parseFloat(value) || 0;
+      });
       pointLearningApi.updateLearning({
-        points_data: pointsData,
+        points_data: numericPointsData,
         check_type: formData.check_type
       }).catch(error => {
         console.error('点位学习失败:', error);
@@ -377,10 +393,11 @@ export function BatchOCRResult({
 
   // 点位数据处理
   const handlePointDataChange = (pointName: string, value: string) => {
-    const numValue = parseFloat(value) || 0;
+    // 直接存储格式化后的字符串值
+    const formattedValue = parseToThreeDecimals(value);
     setPointsData(prev => ({
       ...prev,
-      [pointName]: numValue
+      [pointName]: formattedValue
     }));
   };
 
@@ -400,7 +417,7 @@ export function BatchOCRResult({
     const newPointName = `点位${Object.keys(pointsData).length + 1}`;
     setPointsData(prev => ({
       ...prev,
-      [newPointName]: 0
+      [newPointName]: '0.000'
     }));
   };
 
@@ -434,7 +451,11 @@ export function BatchOCRResult({
         ocr_date: ocrResult.date,
         ocr_temperature: ocrResult.temperature,
         ocr_humidity: ocrResult.humidity,
-        points_data: pointsData
+        // 将字符串点位数据转换为数字格式发送给后端
+        points_data: Object.entries(pointsData).reduce((acc, [key, value]) => {
+          acc[key] = parseFloat(value) || 0;
+          return acc;
+        }, {} as Record<string, number>)
       }
     };
 
@@ -658,7 +679,14 @@ export function BatchOCRResult({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setPointsData(ocrResult.points_data)}
+                      onClick={() => {
+                        // 将数字转换为3位小数格式的字符串
+                        const formattedPointsData: Record<string, string> = {};
+                        Object.entries(ocrResult.points_data).forEach(([key, value]) => {
+                          formattedPointsData[key] = formatToThreeDecimals(value);
+                        });
+                        setPointsData(formattedPointsData);
+                      }}
                       disabled={isLoading}
                     >
                       <RefreshCw className="mr-1 h-4 w-4" />

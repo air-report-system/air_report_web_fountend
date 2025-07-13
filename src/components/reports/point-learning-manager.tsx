@@ -21,7 +21,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { pointLearningApi, checkTypeInferenceApi } from '@/lib/api';
-import { formatError } from '@/lib/utils';
+import { formatError, formatToThreeDecimals } from '@/lib/utils';
 
 interface PointLearningManagerProps {
   pointsData: Record<string, number>;
@@ -305,7 +305,7 @@ export function PointLearningManager({
                     </div>
                     {suggestion.avg_value > 0 && (
                       <div className="text-sm text-gray-500 mt-1">
-                        平均值: {suggestion.avg_value.toFixed(3)}
+                        平均值: {formatToThreeDecimals(suggestion.avg_value)}
                       </div>
                     )}
                   </div>
