@@ -458,9 +458,6 @@ export function BatchReportManager({
                         {report.form_data.contact_person}
                       </div>
                     )}
-                    {report.form_data?.phone && (
-                      <div>{report.form_data.phone}</div>
-                    )}
                     {report.form_data?.project_address && (
                       <div className="truncate">{report.form_data.project_address}</div>
                     )}
