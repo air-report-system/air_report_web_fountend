@@ -48,9 +48,13 @@ export function BatchReportManager({
   const [dateFilter, setDateFilter] = useState<{
     startDate: string;
     endDate: string;
-  }>({
-    startDate: '',
-    endDate: ''
+  }>(() => {
+    // 默认筛选当天的报告
+    const today = new Date().toISOString().split('T')[0];
+    return {
+      startDate: today,
+      endDate: today
+    };
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
