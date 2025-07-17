@@ -211,8 +211,8 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <OCRUpload
-                      onSuccess={showNotification}
-                      onError={showNotification}
+                      onSuccess={(result) => showNotification('success', 'OCR处理完成')}
+                      onError={(error) => showNotification('error', error)}
                       onOCRComplete={setCurrentOcrResult}
                     />
                   </CardContent>
@@ -235,9 +235,9 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <ReportGenerator
-                      onSuccess={showNotification}
-                      onError={showNotification}
-                      ocrResult={currentOcrResult}
+                      onSuccess={(report) => showNotification('success', '报告生成成功')}
+                      onError={(error) => showNotification('error', error)}
+                      ocrResult={currentOcrResult || undefined}
                     />
                   </CardContent>
                 </Card>
@@ -260,8 +260,8 @@ function MainApp() {
                     </CardHeader>
                     <CardContent className="pt-6">
                       <MonthlyReport
-                        onSuccess={showNotification}
-                        onError={showNotification}
+                        onSuccess={(result) => showNotification('success', '月度报表生成成功')}
+                        onError={(error) => showNotification('error', error)}
                       />
                     </CardContent>
                   </Card>
@@ -277,8 +277,8 @@ function MainApp() {
                     </CardHeader>
                     <CardContent className="pt-6">
                       <MonthlyReportDB
-                        onSuccess={showNotification}
-                        onError={showNotification}
+                        onSuccess={(result) => showNotification('success', '数据库月度报表生成成功')}
+                        onError={(error) => showNotification('error', error)}
                       />
                     </CardContent>
                   </Card>
@@ -301,8 +301,8 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <BatchProcessingPage
-                      onSuccess={showNotification}
-                      onError={showNotification}
+                      onSuccess={(message) => showNotification('success', message)}
+                      onError={(error) => showNotification('error', error)}
                     />
                   </CardContent>
                 </Card>
@@ -324,8 +324,8 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <OrderManagementPage
-                      onSuccess={showNotification}
-                      onError={showNotification}
+                      onSuccess={(message) => showNotification('success', message)}
+                      onError={(error) => showNotification('error', error)}
                     />
                   </CardContent>
                 </Card>
