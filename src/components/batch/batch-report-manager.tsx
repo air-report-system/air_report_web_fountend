@@ -416,7 +416,7 @@ export function BatchReportManager({
         {/* 报告列表 */}
         <div className="space-y-2">
           {/* 表头 */}
-          <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg text-sm font-medium">
+          <div className="flex items-center gap-4 p-3 border border-white/30 rounded-lg text-sm font-medium">
             <div className="w-8">
               <Checkbox
                 checked={selectedReports.length === reports.length && reports.length > 0}
@@ -444,7 +444,7 @@ export function BatchReportManager({
             reports.map((report: any) => (
               <div
                 key={report.id}
-                className="flex items-center gap-4 p-3 border rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-4 p-3 border rounded-lg hover:bg-white/10 border-white/30"
               >
                 <div className="w-8">
                   <Checkbox

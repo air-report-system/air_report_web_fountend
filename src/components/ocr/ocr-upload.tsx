@@ -238,7 +238,7 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
           </Button>
 
           {showAdvanced && (
-            <div className="mt-4 p-4 border rounded-lg bg-gray-50 space-y-4">
+            <div className="mt-4 p-4 border rounded-lg border-white/30 space-y-4">
               {/* 多重OCR设置 */}
               <div className="flex items-center space-x-3">
                 <input
@@ -293,12 +293,12 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
 
         {/* 轮询状态显示 */}
         {pollingOcrId && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center gap-2 text-blue-800">
+          <div className="p-3 border border-white/30 rounded-lg">
+            <div className="flex items-center gap-2 text-gray-800">
               <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
               <span className="font-medium">{pollingStatus}</span>
             </div>
-            <p className="text-sm text-blue-600 mt-1">
+            <p className="text-sm text-gray-700 mt-1">
               请稍候，完成后将自动填充表单数据
             </p>
           </div>
@@ -328,9 +328,9 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
         </div>
 
         {/* 处理说明 */}
-        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">处理流程说明：</h4>
-          <ol className="list-decimal list-inside space-y-1 text-blue-800">
+        <div className="text-sm text-gray-800 p-3 rounded-lg border border-white/30">
+          <h4 className="font-medium text-gray-900 mb-2">处理流程说明：</h4>
+          <ol className="list-decimal list-inside space-y-1 text-gray-800">
             <li>上传检测报告图片（支持JPG、PNG等格式）</li>
             <li>AI自动识别图片中的文字信息</li>
             <li>提取关键数据：电话、日期、温湿度、检测点位等</li>

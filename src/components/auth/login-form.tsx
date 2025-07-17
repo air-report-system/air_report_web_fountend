@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 // import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LogIn, User, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import { GlobalBackground } from '@/components/ui/global-background';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -47,40 +48,43 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      {/* 全局背景图 */}
+      <GlobalBackground />
+      
+      <Card className="w-full max-w-md border border-white/50 relative z-10">
+        <CardHeader className="text-center border-b border-white/50">
+          <div className="mx-auto w-12 h-12 border border-white/50 rounded-full flex items-center justify-center mb-4">
             <LogIn className="h-6 w-6 text-blue-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
             登录系统
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-800">
             请输入您的用户名和密码以访问检测报告管理系统
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-800 bg-red-100 border border-red-200 rounded-md">
+              <div className="flex items-center gap-2 p-3 text-sm text-red-800 border border-white/50 rounded-md">
                 <AlertCircle className="h-4 w-4" />
                 <span>{error}</span>
               </div>
             )}
-            
+
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-900">
                 用户名
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <Input
                   type="text"
                   value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
                   placeholder="请输入用户名"
-                  className="pl-10"
+                  className="pl-10 bg-white/20 border-white/50 text-gray-900 placeholder-gray-600"
                   disabled={isLoading}
                   autoComplete="username"
                 />
@@ -88,17 +92,17 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-900">
                 密码
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <Input
                   type="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   placeholder="请输入密码"
-                  className="pl-10"
+                  className="pl-10 bg-white/20 border-white/50 text-gray-900 placeholder-gray-600"
                   disabled={isLoading}
                   autoComplete="current-password"
                 />
@@ -107,7 +111,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-blue-600/80 hover:bg-blue-700/80 text-white border border-white/50"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -125,7 +129,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-700">
               首次使用请联系管理员创建账号
             </p>
           </div>

@@ -130,8 +130,8 @@ export function BatchFileList({
           {fileItems.map((fileItem, index) => (
             <div
               key={fileItem.id}
-              className={`p-3 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
-                index === currentIndex ? 'bg-blue-50 border-blue-200' : ''
+              className={`p-3 border-b cursor-pointer hover:bg-white/10 transition-colors border-white/20 ${
+                index === currentIndex ? 'bg-white/20 border-white/40' : ''
               }`}
               onClick={() => onSelectFile(index)}
             >
@@ -195,7 +195,7 @@ export function BatchFileList({
               
               {/* 错误信息 */}
               {fileItem.error_message && (
-                <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                <div className="mt-2 text-xs text-red-600 border border-white/30 p-2 rounded">
                   {fileItem.error_message}
                 </div>
               )}

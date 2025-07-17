@@ -287,7 +287,7 @@ export function PointLearningManager({
                 {suggestions?.data?.map((suggestion: PointSuggestion) => (
                   <div
                     key={suggestion.point_name}
-                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="p-3 border rounded-lg hover:bg-white/10 cursor-pointer border-white/30"
                     onClick={() => applySuggestion(suggestion)}
                   >
                     <div className="flex items-center justify-between">

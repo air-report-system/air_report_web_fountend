@@ -280,7 +280,7 @@ export function PointLearningTest() {
                         <summary className="cursor-pointer text-gray-500">
                           查看详细数据
                         </summary>
-                        <pre className="mt-2 p-2 bg-gray-50 rounded overflow-auto">
+                        <pre className="mt-2 p-2 border border-white/30 rounded overflow-auto">
                           {JSON.stringify(result.data, null, 2)}
                         </pre>
                       </details>

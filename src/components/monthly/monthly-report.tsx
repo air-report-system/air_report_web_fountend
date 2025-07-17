@@ -183,7 +183,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
           </Button>
 
           {showAdvanced && (
-            <div className="mt-4 p-4 border rounded-lg bg-gray-50 space-y-4">
+            <div className="mt-4 p-4 border rounded-lg border-white/30 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   人工成本文件（可选）
@@ -286,11 +286,11 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
 
         {/* 处理说明 */}
         {!generatedReport && (
-          <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+          <div className="p-4 border-2 border-dashed border-white/30 rounded-lg text-center">
             <BarChart3 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-gray-500 mb-2">报表预览区域</p>
             <p className="text-sm text-gray-400">
-              上传CSV文件并生成报表后，结果将在此处显示
+              上传CSV文件并配置基本信息后，点击"生成报表"查看预览
             </p>
           </div>
         )}

@@ -558,6 +558,36 @@ export const authApi = {
 
   // 检查认证状态
   checkAuth: () => api.get('/auth/profile/'),
+
+  // 背景图管理
+  backgroundImage: {
+    // 获取背景图设置
+    get: () => api.get<{
+      background_image: string | null;
+      background_opacity: number;
+    }>('/auth/background-image/'),
+
+    // 上传背景图
+    upload: (data: {
+      background_image: string;
+      background_opacity?: number;
+    }) => api.post<{
+      message: string;
+      background_image: string;
+      background_opacity: number;
+    }>('/auth/background-image/', data),
+
+    // 更新透明度
+    updateOpacity: (background_opacity: number) => api.patch<{
+      message: string;
+      background_opacity: number;
+    }>('/auth/background-image/', { background_opacity }),
+
+    // 删除背景图
+    delete: () => api.delete<{
+      message: string;
+    }>('/auth/background-image/'),
+  },
 };
 
 // 订单相关API

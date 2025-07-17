@@ -96,7 +96,7 @@ const SelectContent = ({ children }: SelectContentProps) => {
         className="fixed inset-0 z-40"
         onClick={() => setOpen(false)}
       />
-      <div className="absolute top-full left-0 z-50 w-full mt-1 bg-white border border-input rounded-md shadow-lg">
+      <div className="absolute top-full left-0 z-50 w-full mt-1 border border-white/30 rounded-md bg-transparent">
         {children}
       </div>
     </>
@@ -113,7 +113,7 @@ const SelectItem = ({ value, children }: SelectItemProps) => {
 
   return (
     <div
-      className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 first:rounded-t-md last:rounded-b-md"
+      className="px-3 py-2 text-sm cursor-pointer hover:bg-white/10 first:rounded-t-md last:rounded-b-md"
       onClick={handleClick}
     >
       {children}

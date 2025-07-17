@@ -432,7 +432,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
       {/* 详情查看模态框 */}
       {selectedRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+          <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-white/30" style={{ backdropFilter: 'blur(4px)' }}>
             <CardHeader>
               <CardTitle>订单详情</CardTitle>
               <CardDescription>
@@ -443,47 +443,47 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>客户姓名</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.客户姓名}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.客户姓名}</div>
                 </div>
                 <div>
                   <Label>客户电话</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.客户电话 || '-'}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.客户电话 || '-'}</div>
                 </div>
                 <div className="col-span-2">
                   <Label>客户地址</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.客户地址}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.客户地址}</div>
                 </div>
                 <div>
                   <Label>商品类型</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.商品类型 || '-'}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.商品类型 || '-'}</div>
                 </div>
                 <div>
                   <Label>成交金额</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.成交金额 || '-'}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.成交金额 || '-'}</div>
                 </div>
                 <div>
                   <Label>面积</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.面积 || '-'}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.面积 || '-'}</div>
                 </div>
                 <div>
                   <Label>履约时间</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{formatDate(selectedRecord.履约时间)}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{formatDate(selectedRecord.履约时间)}</div>
                 </div>
                 <div>
                   <Label>CMA点位数量</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.CMA点位数量 || '-'}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{selectedRecord.CMA点位数量 || '-'}</div>
                 </div>
                 <div className="col-span-2">
                   <Label>备注赠品</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{formatGiftsDisplay(selectedRecord.备注赠品)}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{formatGiftsDisplay(selectedRecord.备注赠品)}</div>
                 </div>
                 <div>
                   <Label>创建时间</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{formatDateTime(selectedRecord.created_at)}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{formatDateTime(selectedRecord.created_at)}</div>
                 </div>
                 <div>
                   <Label>更新时间</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{formatDateTime(selectedRecord.updated_at)}</div>
+                  <div className="mt-1 p-2 bg-white/20 rounded border border-white/20">{formatDateTime(selectedRecord.updated_at)}</div>
                 </div>
               </div>
               

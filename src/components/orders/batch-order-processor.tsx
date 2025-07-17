@@ -350,7 +350,7 @@ CMA检测：是（2个点）
                       {Object.entries(processedOrder.order_data).map(([field, value]) => (
                         <TableCell 
                           key={field} 
-                          className="cursor-pointer hover:bg-gray-50 relative"
+                          className="cursor-pointer hover:bg-white/10 relative"
                           onDoubleClick={() => handleCellDoubleClick(rowIndex, field, value)}
                         >
                           {editingCell?.row === rowIndex && editingCell?.field === field ? (

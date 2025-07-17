@@ -66,15 +66,15 @@ export function OCRStatusIndicator({
   // 处理中状态
   if (isProcessing) {
     return (
-      <Alert className={`border-blue-200 bg-blue-50 ${className}`}>
-        <Clock className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-800">
+      <Alert className={`border-white/30 ${className}`}>
+        <Clock className="h-4 w-4 text-gray-800" />
+        <AlertDescription className="text-gray-800 drop-shadow-sm">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Loader2 className="h-3 w-3 animate-spin" />
               <span>AI正在处理图片，请耐心等待...</span>
             </div>
-            <div className="text-xs text-blue-600">
+            <div className="text-xs text-gray-700">
               处理时间通常需要1-3分钟，复杂图片可能需要更长时间
             </div>
           </div>

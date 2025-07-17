@@ -279,7 +279,7 @@ export function BatchJobList({ onSuccess, onError, onJobSelected }: BatchJobList
               {filteredJobs.map((job: BatchJob) => (
                 <div
                   key={job.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="p-4 border rounded-lg hover:bg-white/10 transition-colors border-white/20"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">

@@ -189,7 +189,7 @@ export function FileUpload({
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                className="flex items-center justify-between p-3 border border-white/30 rounded-md"
               >
                 <div className="flex items-center space-x-3">
                   {getFileIcon(file)}
