@@ -19,7 +19,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, FileText, CheckCircle, AlertCircle, Upload, Download, Edit2 } from 'lucide-react';
+import { Loader2, FileText, CheckCircle, AlertCircle, Upload, Edit2 } from 'lucide-react';
 
 import { ordersApi } from '@/lib/api';
 
@@ -42,7 +42,6 @@ interface ProcessedOrder {
 }
 
 interface BatchProcessResult {
-  formatted_csv_lines: string[];
   order_data_list: ProcessedOrder[];
   validation_errors: string[];
   total_orders: number;
@@ -56,7 +55,6 @@ interface BatchOrderProcessorProps {
 export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorProps) {
   const [orderTexts, setOrderTexts] = useState('');
   const [processedOrders, setProcessedOrders] = useState<ProcessedOrder[]>([]);
-  const [formattedCsvLines, setFormattedCsvLines] = useState<string[]>([]);
   const [globalValidationErrors, setGlobalValidationErrors] = useState<string[]>([]);
   const [totalOrders, setTotalOrders] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,7 +83,6 @@ export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorP
       }
       
       setProcessedOrders(result.order_data_list);
-      setFormattedCsvLines(result.formatted_csv_lines || []);
       setGlobalValidationErrors(result.validation_errors || []);
       setTotalOrders(result.total_orders || result.order_data_list.length);
       setShowResults(true);
@@ -161,7 +158,6 @@ export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorP
       // 重置表单
       setOrderTexts('');
       setProcessedOrders([]);
-      setFormattedCsvLines([]);
       setGlobalValidationErrors([]);
       setTotalOrders(0);
       setShowResults(false);
@@ -173,23 +169,20 @@ export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorP
     }
   };
 
-  const exportCsvData = () => {
-    const csvContent = formattedCsvLines.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `batch_orders_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
   const hasValidationErrors = processedOrders.some(order => order.validation_errors.length > 0) || globalValidationErrors.length > 0;
+
+  // 格式化JSON显示
+  const formatJsonDisplay = (value: string, field: string) => {
+    if (field === '备注赠品' && value) {
+      try {
+        const parsed = JSON.parse(value);
+        return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
+      } catch {
+        return value; // 如果解析失败，返回原始值
+      }
+    }
+    return value;
+  };
 
   return (
     <div className="space-y-6">
@@ -373,7 +366,7 @@ CMA检测：是（2个点）
                                   value={tempValue}
                                   onChange={(e) => setTempValue(e.target.value)}
                                   onKeyDown={handleCellKeyPress}
-                                  placeholder={field === '备注赠品' ? '格式：{除醛宝:2,炭包:1}' : `请输入${field}`}
+                                  placeholder={field === '备注赠品' ? 'JSON格式：{"除醛宝": 15, "炭包": 3}' : `请输入${field}`}
                                   rows={2}
                                   className="w-full text-sm"
                                   autoFocus
@@ -398,7 +391,9 @@ CMA检测：是（2个点）
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
-                              <span className="truncate" title={value}>{value || '-'}</span>
+                              <span className="truncate" title={formatJsonDisplay(value, field)}>
+                                {formatJsonDisplay(value, field) || '-'}
+                              </span>
                               <Edit2 className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
                           )}
@@ -444,16 +439,6 @@ CMA检测：是（2个点）
 
             {/* 操作按钮 */}
             <div className="flex gap-4 justify-end">
-              {formattedCsvLines.length > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={exportCsvData}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  导出CSV
-                </Button>
-              )}
-              
               <Button
                 onClick={handleSubmitBatchOrders}
                 disabled={isSubmitting || hasValidationErrors}
