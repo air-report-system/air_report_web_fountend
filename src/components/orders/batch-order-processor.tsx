@@ -305,17 +305,17 @@ CMA检测：是（2个点）
 
             {/* 处理结果统计 */}
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center p-3 bg-blue-50 rounded">
+              <div className="text-center p-3 border border-blue-500/50 rounded">
                 <div className="text-2xl font-bold text-blue-600">{totalOrders}</div>
                 <div className="text-sm text-blue-800">总订单数</div>
               </div>
-              <div className="text-center p-3 bg-green-50 rounded">
+              <div className="text-center p-3 border border-green-500/50 rounded">
                 <div className="text-2xl font-bold text-green-600">
                   {processedOrders.filter(order => order.validation_errors.length === 0).length}
                 </div>
                 <div className="text-sm text-green-800">验证通过</div>
               </div>
-              <div className="text-center p-3 bg-red-50 rounded">
+              <div className="text-center p-3 border border-red-500/50 rounded">
                 <div className="text-2xl font-bold text-red-600">
                   {processedOrders.filter(order => order.validation_errors.length > 0).length}
                 </div>

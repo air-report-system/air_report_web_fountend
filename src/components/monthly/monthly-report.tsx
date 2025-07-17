@@ -133,7 +133,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
             maxSize={50 * 1024 * 1024} // 50MB
           />
           {csvFile && (
-            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+            <div className="mt-2 p-2 border border-green-500/50 rounded text-sm text-green-700">
               已选择：{csvFile.name}
             </div>
           )}
@@ -196,7 +196,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
                   maxSize={1 * 1024 * 1024} // 1MB
                 />
                 {laborCostFile && (
-                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
+                  <div className="mt-2 p-2 border border-blue-500/50 rounded text-sm text-blue-700">
                     已选择：{laborCostFile.name}
                   </div>
                 )}
@@ -242,7 +242,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
 
         {/* 生成结果 */}
         {generatedReport && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="p-4 border border-green-500/50 rounded-lg">
             <div className="flex items-center gap-2 text-green-800 mb-3">
               <CheckCircle className="h-4 w-4" />
               <span className="font-medium">报表生成成功</span>
@@ -273,7 +273,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
         )}
 
         {/* CSV格式说明 */}
-        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+        <div className="text-sm text-gray-600 border border-blue-500/50 p-3 rounded-lg">
           <h4 className="font-medium text-blue-900 mb-2">CSV文件格式要求：</h4>
           <ul className="list-disc list-inside space-y-1 text-blue-800">
             <li>必须包含：履约时间、成交金额列</li>

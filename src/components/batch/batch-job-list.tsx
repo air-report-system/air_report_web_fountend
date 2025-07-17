@@ -106,21 +106,21 @@ export function BatchJobList({ onSuccess, onError, onJobSelected }: BatchJobList
     switch (status) {
       case 'completed':
         return (
-          <Badge className="bg-green-500 text-white">
+          <Badge className="border-green-500/50 bg-transparent text-green-600">
             <CheckCircle className="h-3 w-3 mr-1" />
             已完成
           </Badge>
         );
       case 'running':
         return (
-          <Badge className="bg-blue-500 text-white">
+          <Badge className="border-blue-500/50 bg-transparent text-blue-600">
             <Clock className="h-3 w-3 mr-1" />
             运行中
           </Badge>
         );
       case 'failed':
         return (
-          <Badge className="bg-red-500 text-white">
+          <Badge className="border-red-500/50 bg-transparent text-red-600">
             <AlertCircle className="h-3 w-3 mr-1" />
             失败
           </Badge>
@@ -133,7 +133,7 @@ export function BatchJobList({ onSuccess, onError, onJobSelected }: BatchJobList
         );
       case 'pending':
         return (
-          <Badge className="bg-gray-500 text-white">
+          <Badge className="border-gray-500/50 bg-transparent text-gray-600">
             <Clock className="h-3 w-3 mr-1" />
             待处理
           </Badge>

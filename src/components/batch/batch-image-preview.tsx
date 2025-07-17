@@ -192,12 +192,12 @@ export function BatchImagePreview({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'failed': return 'bg-red-500';
-      case 'processing': return 'bg-blue-500';
-      case 'pending': return 'bg-gray-400';
-      case 'skipped': return 'bg-yellow-500';
-      default: return 'bg-gray-400';
+      case 'completed': return 'border-green-500/50 bg-transparent text-green-600';
+      case 'failed': return 'border-red-500/50 bg-transparent text-red-600';
+      case 'processing': return 'border-blue-500/50 bg-transparent text-blue-600';
+      case 'pending': return 'border-gray-500/50 bg-transparent text-gray-600';
+      case 'skipped': return 'border-yellow-500/50 bg-transparent text-yellow-600';
+      default: return 'border-gray-500/50 bg-transparent text-gray-600';
     }
   };
 

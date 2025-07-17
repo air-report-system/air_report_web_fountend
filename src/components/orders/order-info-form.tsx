@@ -223,7 +223,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
 
             {/* 重复记录警告 */}
             {duplicateCheck && duplicateCheck.is_duplicate && (
-              <Alert className="border-yellow-200 bg-yellow-50">
+              <Alert className="border-yellow-500/50">
                 <AlertCircle className="h-4 w-4 text-yellow-600" />
                 <AlertDescription>
                   <div className="space-y-2">
@@ -232,7 +232,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
                     </div>
                     <div className="space-y-2">
                       {duplicateCheck.match_details.map((detail: any, index: number) => (
-                        <div key={index} className="p-2 bg-yellow-100 rounded text-sm">
+                        <div key={index} className="p-2 border border-yellow-500/50 rounded text-sm">
                           <div className="font-medium text-yellow-900">
                             匹配原因：{detail.match_type}
                           </div>
@@ -336,7 +336,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
             <Button
               onClick={handleSubmitOrder}
               disabled={isSubmitting || validationErrors.length > 0}
-              className={`w-full ${duplicateCheck && duplicateCheck.is_duplicate ? 'bg-yellow-600 hover:bg-yellow-700' : ''}`}
+              className={`w-full ${duplicateCheck && duplicateCheck.is_duplicate ? 'border-yellow-500/50 hover:bg-white/10' : ''}`}
             >
               {isSubmitting ? (
                 <>

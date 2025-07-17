@@ -28,7 +28,7 @@ export function Progress({
     >
       <div
         className={cn(
-          'h-full w-full flex-1 bg-blue-600 transition-all duration-300 ease-in-out',
+          'h-full w-full flex-1 bg-blue-500/80 transition-all duration-300 ease-in-out',
           indicatorClassName
         )}
         style={{

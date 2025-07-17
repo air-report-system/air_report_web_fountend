@@ -182,7 +182,7 @@ export function BatchReportManager({
 
     if (isRegenerating) {
       return (
-        <Badge className="bg-blue-500 text-white">
+        <Badge className="border-blue-500/50 bg-transparent text-blue-600">
           <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
           生成中...
         </Badge>
@@ -191,7 +191,7 @@ export function BatchReportManager({
 
     if (report.is_generated) {
       return (
-        <Badge className="bg-green-500 text-white">
+        <Badge className="border-green-500/50 bg-transparent text-green-600">
           <CheckCircle className="h-3 w-3 mr-1" />
           已生成
         </Badge>
@@ -321,7 +321,7 @@ export function BatchReportManager({
           </div>
 
           {/* 日期筛选 */}
-          <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-4 p-3 border border-white/30 bg-transparent rounded-lg">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">创建时间:</span>
@@ -385,7 +385,7 @@ export function BatchReportManager({
 
         {/* 批量操作 */}
         {selectedReports.length > 0 && (
-          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+          <div className="flex items-center gap-2 p-3 border border-blue-500/50 bg-transparent rounded-lg">
             <span className="text-sm text-blue-700">
               已选择 {selectedReports.length} 个报告
             </span>

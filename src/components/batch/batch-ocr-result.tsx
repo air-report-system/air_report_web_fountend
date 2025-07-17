@@ -520,7 +520,7 @@ export function BatchOCRResult({
 
               {/* 联系人信息识别结果 */}
               {ocrResult.contact_info && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-3 border border-blue-500/50 rounded-lg">
                   <div className="font-medium text-blue-800 mb-2">识别到联系人信息:</div>
                   <div className="text-sm text-blue-700 space-y-1">
                     {ocrResult.contact_info.contact_name && (
@@ -623,10 +623,10 @@ export function BatchOCRResult({
                   <select
                     value={formData.check_type}
                     onChange={(e) => handleInputChange('check_type', e.target.value)}
-                    className={`w-full h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent ${
                       inferredCheckType && inferredCheckType !== formData.check_type && checkTypeConfidence > 0.7
-                        ? 'border-orange-300 bg-orange-50'
-                        : 'border-gray-300'
+                        ? 'border-orange-500/50'
+                        : 'border-white/50'
                     }`}
                     disabled={isLoading}
                   >
@@ -709,8 +709,8 @@ export function BatchOCRResult({
               {inferredCheckType && (
                 <div className={`p-3 rounded-lg border ${
                   inferredCheckType === 'initial'
-                    ? 'bg-blue-50 border-blue-200'
-                    : 'bg-green-50 border-green-200'
+                    ? 'border-blue-500/50'
+                    : 'border-green-500/50'
                 }`}>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4" />

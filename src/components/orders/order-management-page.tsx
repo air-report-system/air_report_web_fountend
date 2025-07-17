@@ -79,7 +79,7 @@ export function OrderManagementPage({ onSuccess, onError }: OrderManagementPageP
 
       {/* 通知消息 */}
       {notification && (
-        <Alert className={notification.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+        <Alert className={notification.type === 'success' ? 'border-green-500/50' : 'border-red-500/50'}>
           {notification.type === 'success' ? (
             <CheckCircle className="h-4 w-4 text-green-600" />
           ) : (
@@ -170,7 +170,7 @@ export function OrderManagementPage({ onSuccess, onError }: OrderManagementPageP
             </div>
           </div>
           
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-4 p-4 border border-blue-500/50 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">支持的订单信息格式</h4>
             <div className="text-sm text-blue-800 space-y-1">
               <p>• 客户基本信息：姓名、电话、地址</p>

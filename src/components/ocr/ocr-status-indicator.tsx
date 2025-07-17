@@ -30,7 +30,7 @@ export function OCRStatusIndicator({
   // 成功状态
   if (success && !isProcessing) {
     return (
-      <Alert className={`border-green-200 bg-green-50 ${className}`}>
+      <Alert className={`border-green-500/50 ${className}`}>
         <CheckCircle className="h-4 w-4 text-green-600" />
         <AlertDescription className="text-green-800">
           OCR处理完成！结果已保存到系统中。
@@ -42,7 +42,7 @@ export function OCRStatusIndicator({
   // 错误状态
   if (error && !isProcessing) {
     return (
-      <Alert className={`border-red-200 bg-red-50 ${className}`}>
+      <Alert className={`border-red-500/50 ${className}`}>
         <XCircle className="h-4 w-4 text-red-600" />
         <AlertDescription className="text-red-800">
           {error}
@@ -54,7 +54,7 @@ export function OCRStatusIndicator({
   // 重试状态
   if (isRetrying) {
     return (
-      <Alert className={`border-yellow-200 bg-yellow-50 ${className}`}>
+      <Alert className={`border-yellow-500/50 ${className}`}>
         <Loader2 className="h-4 w-4 text-yellow-600 animate-spin" />
         <AlertDescription className="text-yellow-800">
           连接出现问题，正在重试...请稍候

@@ -223,10 +223,10 @@ export function BatchStepProcessor({
               </span>
               {currentFileItem && (
                 <Badge className={
-                  currentFileItem.status === 'completed' ? 'bg-green-500' :
-                  currentFileItem.status === 'failed' ? 'bg-red-500' :
-                  currentFileItem.status === 'processing' ? 'bg-blue-500' :
-                  'bg-gray-400'
+                  currentFileItem.status === 'completed' ? 'border-green-500/50 bg-transparent text-green-600' :
+                  currentFileItem.status === 'failed' ? 'border-red-500/50 bg-transparent text-red-600' :
+                  currentFileItem.status === 'processing' ? 'border-blue-500/50 bg-transparent text-blue-600' :
+                  'border-gray-500/50 bg-transparent text-gray-600'
                 }>
                   {currentFileItem.status === 'completed' ? '已完成' :
                    currentFileItem.status === 'failed' ? '失败' :

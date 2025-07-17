@@ -57,3 +57,20 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+/* 确保所有表单元素都是透明的 */
+select, option {
+  background-color: transparent !important;
+}
+
+/* 针对Webkit浏览器的select样式 */
+select::-webkit-scrollbar {
+  background-color: transparent;
+}
+
+/* 针对Firefox的select样式 */
+@-moz-document url-prefix() {
+  select {
+    background-color: transparent !important;
+  }
+}

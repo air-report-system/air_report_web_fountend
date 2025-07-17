@@ -88,7 +88,7 @@ export const AiConfigActions = ({ config, onEdit }: AiConfigActionsProps) => {
             </AlertDialog>
 
             {testResult && (
-                <div className="text-sm ml-4 p-2 rounded-md bg-muted">
+                <div className="text-sm ml-4 p-2 rounded-md border border-white/50">
                    测试结果: {testResult.success ? <span className="text-green-600">成功</span> : <span className="text-red-600">失败</span>}
                    {testResult.message && ` - ${testResult.message}`}
                 </div>

@@ -198,7 +198,7 @@ function MainApp() {
               {/* OCR图片处理 */}
               <TabsContent value="ocr" className="mt-0 p-6">
                 <Card
-                  className="border border-white/50 bg-white/20"
+                  className="border border-white/50"
                 >
                   <CardHeader className="border-b border-white/50">
                     <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -222,7 +222,7 @@ function MainApp() {
               {/* 报告生成 */}
               <TabsContent value="reports" className="mt-0 p-6">
                 <Card
-                  className="border border-white/50 bg-white/20"
+                  className="border border-white/50"
                 >
                   <CardHeader className="border-b border-white/50">
                     <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -247,7 +247,7 @@ function MainApp() {
               <TabsContent value="monthly" className="mt-0 p-6">
                 <div className="space-y-6">
                   <Card
-                    className="border border-white/50 bg-white/20"
+                    className="border border-white/50"
                   >
                     <CardHeader className="border-b border-white/50">
                       <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -267,7 +267,7 @@ function MainApp() {
                   </Card>
 
                   <Card
-                    className="border border-white/50 bg-white/20"
+                    className="border border-white/50"
                   >
                     <CardHeader className="border-b border-white/50">
                       <CardTitle className="text-gray-900">数据库月度报表</CardTitle>
@@ -288,7 +288,7 @@ function MainApp() {
               {/* 批量处理 */}
               <TabsContent value="batch" className="mt-0 p-6">
                 <Card
-                  className="border border-white/50 bg-white/20"
+                  className="border border-white/50"
                 >
                   <CardHeader className="border-b border-white/50">
                     <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -311,7 +311,7 @@ function MainApp() {
               {/* 订单管理 */}
               <TabsContent value="orders" className="mt-0 p-6">
                 <Card
-                  className="border border-white/50 bg-white/20"
+                  className="border border-white/50"
                 >
                   <CardHeader className="border-b border-white/50">
                     <CardTitle className="flex items-center gap-2 text-gray-900">

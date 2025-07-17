@@ -311,7 +311,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
                 <Info className="h-4 w-4" />
                 AI整理建议
               </Label>
-              <div className="bg-white/20 border border-white/30 rounded-lg p-3" style={{ backdropFilter: 'blur(4px)' }}>
+              <div className="border border-blue-500/50 rounded-lg p-3">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <p className="text-sm font-medium text-blue-800">
                     人工成本整理Prompt
@@ -327,7 +327,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
                     复制
                   </Button>
                 </div>
-                <div className="text-xs text-blue-700 bg-white/20 rounded p-2 font-mono whitespace-pre-line border border-white/30" style={{ backdropFilter: 'blur(4px)' }}>
+                <div className="text-xs text-blue-700 rounded p-2 font-mono whitespace-pre-line border border-blue-500/50">
                   {`整理每天的人工费邮费:(今年2025年)
 日期可能在每条消息的右上角, 但是如果消息内容明确说明了是哪天的, 则以消息内说明的为准, 同一天的应合并
 关于时间的补充, 如果消息是在早上7点之前发的, 则算前一天, 比如5号凌晨发的今日则算4号
@@ -383,7 +383,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
         <Button
           onClick={handleGenerateReport}
           disabled={isLoading}
-          className="w-full bg-transparent border border-white/30 hover:bg-white/10 text-gray-900"
+          className="w-full bg-transparent border border-blue-500/50 hover:bg-white/10 text-gray-900"
         >
           {isLoading ? (
             <>
@@ -400,7 +400,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
 
         {/* 生成结果 */}
         {generatedReport && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="p-4 border border-green-500/50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
@@ -410,7 +410,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
                 onClick={handleDownloadReport}
                 variant="outline"
                 size="sm"
-                className="text-green-700 border-green-300 hover:bg-green-100"
+                className="text-green-700 border-green-500/50 hover:bg-white/10"
               >
                 <Download className="h-4 w-4 mr-2" />
                 下载报表
@@ -444,7 +444,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
         )}
 
         {/* 功能说明 */}
-        <div className="text-sm text-gray-800 bg-white/20 p-3 rounded-lg border border-white/30" style={{ backdropFilter: 'blur(4px)' }}>
+        <div className="text-sm text-gray-800 border border-blue-500/50 p-3 rounded-lg">
           <h4 className="font-medium text-blue-900 mb-2">功能说明：</h4>
           <ul className="list-disc list-inside space-y-1 text-blue-800">
             <li>直接从数据库中的订单记录生成报表</li>
