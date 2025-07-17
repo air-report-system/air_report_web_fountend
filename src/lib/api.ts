@@ -226,7 +226,7 @@ export const ocrApi = {
   // 上传图片并开始OCR处理
   uploadAndProcess: (file: File, useMultiOcr = false, ocrCount = 3) => {
     const formData = new FormData();
-    formData.append('image', file);  // 修复：使用正确的字段名 'image' 而不是 'file'
+    formData.append('image', file);
     formData.append('use_multi_ocr', useMultiOcr.toString());
     formData.append('ocr_count', ocrCount.toString());
 

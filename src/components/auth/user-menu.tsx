@@ -6,8 +6,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AiConfigManager } from '@/components/ai-config/ai-config-manager';
 
 export function UserMenu() {
   const { user, logout } = useAuth();
@@ -68,6 +70,21 @@ export function UserMenu() {
             </div>
 
             <div className="p-1">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>AI 配置</span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[80vw] md:max-w-[70vw] lg:max-w-[60vw]">
+                  <DialogHeader>
+                    <DialogTitle>AI 服务配置</DialogTitle>
+                  </DialogHeader>
+                  <AiConfigManager />
+                </DialogContent>
+              </Dialog>
+
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
