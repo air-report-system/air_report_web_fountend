@@ -145,6 +145,17 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
     return new Date(dateString).toLocaleString('zh-CN');
   };
 
+  // 格式化JSON显示 - 特别针对备注赠品字段
+  const formatGiftsDisplay = (giftsJson: string) => {
+    if (!giftsJson) return '-';
+    try {
+      const parsed = JSON.parse(giftsJson);
+      return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
+    } catch {
+      return giftsJson; // 如果解析失败，返回原始值
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 搜索过滤 */}
@@ -357,9 +368,9 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                             <Package className="h-3 w-3 text-gray-400 flex-shrink-0" />
                             <span
                               className="text-sm truncate max-w-[130px]"
-                              title={record.备注赠品}
+                              title={formatGiftsDisplay(record.备注赠品)}
                             >
-                              {record.备注赠品}
+                              {formatGiftsDisplay(record.备注赠品)}
                             </span>
                           </div>
                         ) : '-'}
@@ -453,7 +464,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                 </div>
                 <div className="col-span-2">
                   <Label>备注赠品</Label>
-                  <div className="mt-1 p-2 bg-gray-50 rounded">{selectedRecord.备注赠品 || '-'}</div>
+                  <div className="mt-1 p-2 bg-gray-50 rounded">{formatGiftsDisplay(selectedRecord.备注赠品)}</div>
                 </div>
                 <div>
                   <Label>创建时间</Label>

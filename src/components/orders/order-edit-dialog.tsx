@@ -273,7 +273,7 @@ export function OrderEditDialog({
                 id="备注赠品"
                 value={formData.备注赠品 || ''}
                 onChange={(e) => handleInputChange('备注赠品', e.target.value)}
-                placeholder="格式：{除醛宝:2;炭包:1}"
+                placeholder='JSON格式：{"除醛宝": 15, "炭包": 3}'
                 className="mt-1"
                 rows={2}
               />
