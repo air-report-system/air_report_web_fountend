@@ -119,9 +119,14 @@ export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorP
     );
   };
 
-  const handleCellDoubleClick = (rowIndex: number, field: string, currentValue: string) => {
+  const handleCellDoubleClick = (rowIndex: number, field: string, currentValue: any) => {
     setEditingCell({ row: rowIndex, field });
-    setTempValue(currentValue);
+    // 如果是对象（如备注赠品），转换为JSON字符串进行编辑
+    if (typeof currentValue === 'object' && currentValue !== null) {
+      setTempValue(JSON.stringify(currentValue));
+    } else {
+      setTempValue(currentValue || '');
+    }
   };
 
   const handleCellKeyPress = (e: React.KeyboardEvent) => {
@@ -172,16 +177,27 @@ export function BatchOrderProcessor({ onSuccess, onError }: BatchOrderProcessorP
   const hasValidationErrors = processedOrders.some(order => order.validation_errors.length > 0) || globalValidationErrors.length > 0;
 
   // 格式化JSON显示
-  const formatJsonDisplay = (value: string, field: string) => {
+  const formatJsonDisplay = (value: any, field: string) => {
     if (field === '备注赠品' && value) {
-      try {
-        const parsed = JSON.parse(value);
-        return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
-      } catch {
-        return value; // 如果解析失败，返回原始值
+      // 如果value已经是对象，直接格式化
+      if (typeof value === 'object' && value !== null) {
+        return Object.entries(value).map(([key, val]) => `${key}: ${val}`).join(', ');
+      }
+      // 如果是字符串，尝试解析
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
+        } catch {
+          return value; // 如果解析失败，返回原始值
+        }
       }
     }
-    return value;
+    // 确保返回字符串或数字，避免直接渲染对象
+    if (typeof value === 'object' && value !== null) {
+      return JSON.stringify(value);
+    }
+    return value || '';
   };
 
   return (

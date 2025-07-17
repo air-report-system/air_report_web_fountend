@@ -146,14 +146,25 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
   };
 
   // 格式化JSON显示 - 特别针对备注赠品字段
-  const formatGiftsDisplay = (giftsJson: string) => {
-    if (!giftsJson) return '-';
-    try {
-      const parsed = JSON.parse(giftsJson);
-      return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
-    } catch {
-      return giftsJson; // 如果解析失败，返回原始值
+  const formatGiftsDisplay = (giftsData: any) => {
+    if (!giftsData) return '-';
+
+    // 如果已经是对象，直接格式化
+    if (typeof giftsData === 'object' && giftsData !== null) {
+      return Object.entries(giftsData).map(([key, val]) => `${key}: ${val}`).join(', ');
     }
+
+    // 如果是字符串，尝试解析
+    if (typeof giftsData === 'string') {
+      try {
+        const parsed = JSON.parse(giftsData);
+        return Object.entries(parsed).map(([key, val]) => `${key}: ${val}`).join(', ');
+      } catch {
+        return giftsData; // 如果解析失败，返回原始值
+      }
+    }
+
+    return String(giftsData);
   };
 
   return (
