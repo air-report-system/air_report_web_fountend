@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OCRUpload } from '@/components/ocr/ocr-upload';
 import { ReportGenerator } from '@/components/reports/report-generator-simple';
@@ -12,12 +13,11 @@ import { LoginForm } from '@/components/auth/login-form';
 import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { FileText, Upload, BarChart3, Settings, ShoppingCart, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { OCRResult } from '@/lib/api';
 import { VersionDisplayInline } from '@/components/ui/version-display';
 import { GlobalBackground } from '@/components/ui/global-background';
-import { useBackground } from '@/contexts/background-context';
 
 // 创建QueryClient实例
 const queryClient = new QueryClient({
@@ -36,7 +36,6 @@ function MainApp() {
   const [currentOcrResult, setCurrentOcrResult] = useState<OCRResult | null>(null);
   const [mounted, setMounted] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
-  const { uiOpacity } = useBackground();
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // 确保组件已挂载，避免hydration不匹配
@@ -79,9 +78,11 @@ function MainApp() {
           <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <img
+                <Image
                   src="/logo.svg"
                   alt="空气检测系统Logo"
+                  width={40}
+                  height={40}
                   className="h-10 w-10"
                 />
                 <h1 className="ml-3 text-xl font-semibold text-gray-900">
@@ -211,7 +212,7 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <OCRUpload
-                      onSuccess={(result) => showNotification('success', 'OCR处理完成')}
+                      onSuccess={() => showNotification('success', 'OCR处理完成')}
                       onError={(error) => showNotification('error', error)}
                       onOCRComplete={setCurrentOcrResult}
                     />
@@ -235,7 +236,7 @@ function MainApp() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <ReportGenerator
-                      onSuccess={(report) => showNotification('success', '报告生成成功')}
+                      onSuccess={() => showNotification('success', '报告生成成功')}
                       onError={(error) => showNotification('error', error)}
                       ocrResult={currentOcrResult || undefined}
                     />
@@ -260,7 +261,7 @@ function MainApp() {
                     </CardHeader>
                     <CardContent className="pt-6">
                       <MonthlyReport
-                        onSuccess={(result) => showNotification('success', '月度报表生成成功')}
+                        onSuccess={() => showNotification('success', '月度报表生成成功')}
                         onError={(error) => showNotification('error', error)}
                       />
                     </CardContent>
@@ -277,7 +278,7 @@ function MainApp() {
                     </CardHeader>
                     <CardContent className="pt-6">
                       <MonthlyReportDB
-                        onSuccess={(result) => showNotification('success', '数据库月度报表生成成功')}
+                        onSuccess={() => showNotification('success', '数据库月度报表生成成功')}
                         onError={(error) => showNotification('error', error)}
                       />
                     </CardContent>

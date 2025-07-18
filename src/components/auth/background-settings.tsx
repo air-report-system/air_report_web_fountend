@@ -4,6 +4,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -93,17 +94,21 @@ export function BackgroundSettings() {
           window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
 
           showMessage('success', '背景图上传成功');
-        } catch (error: any) {
-          const errorMessage = error.response?.data?.background_image?.[0] || 
-                             error.response?.data?.error || 
-                             '上传失败';
+        } catch (error: unknown) {
+          let errorMessage = '上传失败';
+          if (error && typeof error === 'object' && 'response' in error) {
+            const axiosError = error as { response: { data: { background_image?: string[]; error?: string } } };
+            errorMessage = axiosError.response?.data?.background_image?.[0] ||
+                          axiosError.response?.data?.error ||
+                          '上传失败';
+          }
           showMessage('error', errorMessage);
         } finally {
           setIsLoading(false);
         }
       };
       reader.readAsDataURL(file);
-    } catch (error) {
+    } catch {
       showMessage('error', '文件读取失败');
       setIsLoading(false);
     }
@@ -128,8 +133,12 @@ export function BackgroundSettings() {
 
       // 发送事件通知全局背景组件更新
       window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || '透明度更新失败';
+    } catch (error: unknown) {
+      let errorMessage = '透明度更新失败';
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: { error?: string } } };
+        errorMessage = axiosError.response?.data?.error || '透明度更新失败';
+      }
       showMessage('error', errorMessage);
     }
   };
@@ -153,8 +162,12 @@ export function BackgroundSettings() {
       window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
 
       showMessage('success', '背景图删除成功');
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || '删除失败';
+    } catch (error: unknown) {
+      let errorMessage = '删除失败';
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: { error?: string } } };
+        errorMessage = axiosError.response?.data?.error || '删除失败';
+      }
       showMessage('error', errorMessage);
     } finally {
       setIsLoading(false);
@@ -269,10 +282,11 @@ export function BackgroundSettings() {
           <div className="space-y-2">
             <Label className="text-gray-900 drop-shadow-sm">当前背景图</Label>
             <div className="relative w-full h-32 border rounded-lg overflow-hidden border-white/30">
-              <img
+              <Image
                 src={settings.background_image}
                 alt="背景图预览"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
                 style={{ opacity: settings.background_opacity }}
               />
               <div className="absolute inset-0 bg-gray-900" style={{ opacity: 1 - settings.background_opacity }} />

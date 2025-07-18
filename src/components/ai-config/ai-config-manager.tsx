@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { AiConfigList } from './ai-config-list';
 import { AiConfigForm } from './ai-config-form';
 import { AiConfigStatus } from './ai-config-status';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export const AiConfigManager = () => {
     const { loading, error } = useAiConfig();

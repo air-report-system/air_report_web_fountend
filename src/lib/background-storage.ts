@@ -71,7 +71,7 @@ export class BackgroundStorageManager {
   public getStorageStatus(): StorageStatus {
     const available = this.isAvailable();
     let used = 0;
-    let total = 5 * 1024 * 1024; // 5MB估算
+    const total = 5 * 1024 * 1024; // 5MB估算
     let percentage = 0;
 
     if (available) {

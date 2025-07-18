@@ -18,7 +18,7 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react';
-import { backgroundStorage } from '@/lib/background-storage';
+
 import { getLocalStorageUsage, formatFileSize } from '@/lib/utils';
 import { useBackground } from '@/contexts/background-context';
 
@@ -46,7 +46,7 @@ export function CacheManagement() {
       clearCache();
       refreshStorageUsage();
       showMessage('success', '缓存清理成功');
-    } catch (error) {
+    } catch {
       showMessage('error', '缓存清理失败');
     } finally {
       setIsClearing(false);
@@ -60,7 +60,7 @@ export function CacheManagement() {
         localStorage.clear();
         refreshStorageUsage();
         showMessage('success', '所有本地存储数据已清理');
-      } catch (error) {
+      } catch {
         showMessage('error', '清理失败');
       }
     }
@@ -213,8 +213,8 @@ export function CacheManagement() {
         <div className="bg-green-50/20 border border-green-200/30 rounded-lg p-4">
           <h4 className="text-sm font-medium text-gray-900 mb-2">使用提示</h4>
           <ul className="text-xs text-gray-700 space-y-1">
-            <li>• 如果背景图显示异常，可以尝试"同步服务器"</li>
-            <li>• 如果需要立即看到服务器端的更新，点击"同步服务器"</li>
+            <li>• 如果背景图显示异常，可以尝试&ldquo;同步服务器&rdquo;</li>
+            <li>• 如果需要立即看到服务器端的更新，点击&ldquo;同步服务器&rdquo;</li>
             <li>• 存储空间不足时，可以先清理缓存再重新加载</li>
             <li>• 清理所有本地数据会删除登录状态，请谨慎操作</li>
           </ul>

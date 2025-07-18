@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useForm, Controller, FieldError } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAiConfig, AiConfig } from '@/contexts/ai-config-context';
@@ -112,14 +112,20 @@ export const AiConfigForm = ({ configToEdit, onFinished }: AiConfigFormProps) =>
                 onFinished();
             }
 
-        } catch (error: any) {
-            if (error.response && error.response.data) {
-                const backendErrors = error.response.data;
-                 if (typeof backendErrors === 'object' && backendErrors !== null) {
-                    setServerErrors(backendErrors);
+        } catch (error: unknown) {
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response: { data: unknown } };
+                if (axiosError.response && axiosError.response.data) {
+                    const backendErrors = axiosError.response.data;
+                    if (typeof backendErrors === 'object' && backendErrors !== null) {
+                        setServerErrors(backendErrors as Record<string, string[]>);
+                    } else {
+                        // 通用错误
+                        const errorMessage = error instanceof Error ? error.message : '保存失败';
+                        setServerErrors({ non_field_errors: [errorMessage] });
+                    }
                 } else {
-                    // 通用错误
-                    setServerErrors({ non_field_errors: [error.message || '保存失败'] });
+                    setServerErrors({ non_field_errors: ['网络请求失败'] });
                 }
             } else {
                 console.error("保存配置失败:", error);

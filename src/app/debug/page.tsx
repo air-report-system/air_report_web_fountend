@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from 'react';
 
+interface EnvData {
+  NODE_ENV?: string;
+  NEXT_PUBLIC_API_URL?: string;
+}
+
 export default function DebugPage() {
-  const [envData, setEnvData] = useState<any>(null);
+  const [envData, setEnvData] = useState<EnvData | null>(null);
   const [testResult, setTestResult] = useState<string>('');
 
   useEffect(() => {
