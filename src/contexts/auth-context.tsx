@@ -29,54 +29,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 检查认证状态
   const checkAuth = async () => {
-    const AUTH_TIMEOUT = 5000; // 5秒超时
-    
     try {
       if (typeof window === 'undefined') return;
 
       const token = localStorage.getItem('auth_token');
       if (!token) {
-        console.log('没有找到认证token，跳过认证检查');
         setIsLoading(false);
         return;
       }
 
-      console.log('开始检查认证状态...');
-      const startTime = performance.now();
-
-      // 创建超时Promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('AUTH_TIMEOUT'));
-        }, AUTH_TIMEOUT);
-      });
-
-      try {
-        // 使用Promise.race实现超时
-        const response = await Promise.race([
-          authApi.getProfile(),
-          timeoutPromise
-        ]) as any;
-        
-        const endTime = performance.now();
-        console.log(`认证检查成功，耗时: ${(endTime - startTime).toFixed(2)}ms`);
-        
-        setUser(response.data);
-      } catch (error: any) {
-        if (error.message === 'AUTH_TIMEOUT') {
-          console.warn('认证检查超时，允许用户继续使用应用');
-          // 超时不清除token，让用户可以重试
-        } else {
-          console.error('检查认证状态失败:', error);
-          // 只有在真正的错误时才清除token
-          if (error.response?.status === 401 || error.response?.status === 403) {
-            localStorage.removeItem('auth_token');
-          }
-        }
-        setUser(null);
+      const response = await authApi.getProfile();
+      setUser(response.data);
+    } catch (error: any) {
+      console.error('检查认证状态失败:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem('auth_token');
       }
-    } catch (error) {
-      console.error('认证检查过程中发生错误:', error);
       setUser(null);
     } finally {
       setIsLoading(false);

@@ -39,16 +39,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 检查是否在客户端环境
-    if (typeof window !== 'undefined') {
-      if (error.response?.status === 401) {
-        // Token过期，清除本地存储并重定向到登录页
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
-      }
-    }
-    
     // 处理HTML错误响应，防止React尝试渲染HTML
     if (error.response?.data && typeof error.response.data === 'string' && error.response.data.includes('<html>')) {
       // 将HTML响应替换为结构化错误
@@ -210,12 +200,7 @@ ocrApi_instance.interceptors.response.use(
       return ocrApi_instance(config);
     }
 
-    // 处理401错误
-    if (typeof window !== 'undefined' && error.response?.status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      window.location.href = '/login';
-    }
+    // 移除了认证超时处理逻辑，避免影响登录状态保存
 
     return Promise.reject(error);
   }
