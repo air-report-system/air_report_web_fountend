@@ -12,14 +12,14 @@ const STORAGE_KEYS = {
 
 // 缓存配置
 const CACHE_CONFIG = {
-  // 缓存过期时间（24小时）
-  EXPIRE_TIME: 24 * 60 * 60 * 1000,
+  // 缓存过期时间（7天）
+  EXPIRE_TIME: 7 * 24 * 60 * 60 * 1000,
   // 最大图片大小（2MB，考虑localStorage限制）
   MAX_IMAGE_SIZE: 2 * 1024 * 1024,
   // 压缩质量
-  COMPRESS_QUALITY: 0.8,
+  COMPRESS_QUALITY: 0.7,
   // 最大宽度/高度
-  MAX_DIMENSION: 1920,
+  MAX_DIMENSION: 1600,
 } as const;
 
 // 背景图数据接口
@@ -100,9 +100,62 @@ export class BackgroundStorageManager {
   }
 
   /**
-   * 压缩图片
+   * 使用Web Worker压缩图片（避免主线程阻塞）
    */
-  private async compressImage(base64String: string): Promise<{
+  private async compressImageWithWorker(base64String: string): Promise<{
+    compressedData: string;
+    originalSize: number;
+    compressedSize: number;
+  }> {
+    return new Promise((resolve, reject) => {
+      // 检查Web Worker支持
+      if (typeof Worker === 'undefined') {
+        console.warn('Web Worker不支持，使用主线程压缩');
+        return this.compressImageMainThread(base64String).then(resolve).catch(reject);
+      }
+
+      try {
+        const worker = new Worker('/workers/image-compressor.js');
+        
+        worker.onmessage = (e) => {
+          const { success, compressedData, originalSize, compressedSize, error } = e.data;
+          
+          if (success) {
+            resolve({
+              compressedData,
+              originalSize,
+              compressedSize,
+            });
+          } else {
+            reject(new Error(error));
+          }
+          
+          worker.terminate();
+        };
+
+        worker.onerror = (error) => {
+          console.error('Web Worker错误:', error);
+          reject(new Error('Web Worker处理失败'));
+          worker.terminate();
+        };
+
+        worker.postMessage({
+          imageData: base64String,
+          quality: CACHE_CONFIG.COMPRESS_QUALITY,
+          maxDimension: CACHE_CONFIG.MAX_DIMENSION,
+        });
+
+      } catch (error) {
+        console.warn('Web Worker创建失败，使用主线程压缩:', error);
+        return this.compressImageMainThread(base64String).then(resolve).catch(reject);
+      }
+    });
+  }
+
+  /**
+   * 主线程压缩图片（备用方案）
+   */
+  private async compressImageMainThread(base64String: string): Promise<{
     compressedData: string;
     originalSize: number;
     compressedSize: number;
@@ -190,7 +243,7 @@ export class BackgroundStorageManager {
         if (imageSize > CACHE_CONFIG.MAX_IMAGE_SIZE) {
           try {
             console.log(`开始压缩大图片: ${formatFileSize(imageSize)}`);
-            const compressed = await this.compressImage(data.background_image);
+            const compressed = await this.compressImageWithWorker(data.background_image);
             backgroundData = {
               ...backgroundData,
               background_image: compressed.compressedData,

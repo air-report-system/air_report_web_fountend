@@ -49,43 +49,46 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
     console.log('开始加载背景设置...');
 
-    // 首先尝试从localStorage读取缓存数据
+    // 优先策略：立即使用缓存数据，即使过期也先使用
     const cachedData = backgroundStorage.getBackgroundData();
-    if (cachedData && !backgroundStorage.isCacheExpired()) {
-      console.log('从localStorage加载背景设置:', cachedData);
+    if (cachedData) {
+      console.log('立即使用缓存数据，无需等待服务器响应');
       setBackgroundImage(cachedData.background_image);
       setBackgroundOpacity(cachedData.background_opacity);
       setCacheInfo(backgroundStorage.getCacheInfo());
-
-      // 有效缓存直接返回，不进行后台同步
-      // 这样可以避免不必要的网络请求和图片处理
-      console.log('使用有效缓存，跳过服务器同步');
-      return;
+      
+      // 如果缓存仍然有效，跳过服务器同步
+      if (!backgroundStorage.isCacheExpired()) {
+        console.log('缓存仍然有效，跳过服务器同步');
+        return;
+      }
     }
 
-    // 如果没有缓存或缓存过期，从服务器加载
-    console.log('缓存无效或过期，从服务器加载数据');
-    setIsLoading(true);
+    // 在后台同步服务器数据（不阻塞UI）
+    backgroundSyncFromServer();
+  };
+
+  // 后台同步服务器数据
+  const backgroundSyncFromServer = async () => {
     try {
+      console.log('后台同步服务器数据...');
       const response = await authApi.backgroundImage.get();
-      setBackgroundImage(response.data.background_image);
-      setBackgroundOpacity(response.data.background_opacity);
-      console.log('从服务器加载背景设置完成');
+      
+      // 只有在数据真正不同时才更新UI
+      if (response.data.background_image !== backgroundImage ||
+          response.data.background_opacity !== backgroundOpacity) {
+        console.log('检测到服务器数据变化，更新UI');
+        setBackgroundImage(response.data.background_image);
+        setBackgroundOpacity(response.data.background_opacity);
+      }
 
       // 保存到localStorage，跳过压缩（服务器数据通常已经处理过）
       await backgroundStorage.saveBackgroundData(response.data, { skipCompression: true });
       setCacheInfo(backgroundStorage.getCacheInfo());
+      console.log('后台同步完成');
     } catch (error) {
-      console.error('加载背景图设置失败:', error);
-      // 如果服务器请求失败，尝试使用过期的缓存数据
-      if (cachedData) {
-        console.log('服务器请求失败，使用过期的缓存数据');
-        setBackgroundImage(cachedData.background_image);
-        setBackgroundOpacity(cachedData.background_opacity);
-      }
-    } finally {
-      setIsLoading(false);
-      setCacheInfo(backgroundStorage.getCacheInfo());
+      console.error('后台同步失败:', error);
+      // 同步失败不影响用户体验，继续使用缓存数据
     }
   };
 
@@ -124,7 +127,13 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    loadSettings();
+    // 立即加载缓存数据，不等待认证
+    loadCachedDataImmediately();
+    
+    // 如果已认证，则进行完整的设置加载
+    if (isAuthenticated) {
+      loadSettings();
+    }
 
     // 监听背景图更新事件
     const handleBackgroundUpdate = () => {
@@ -137,6 +146,20 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('backgroundSettingsUpdate', handleBackgroundUpdate);
     };
   }, [isAuthenticated]);
+
+  // 立即加载缓存数据（不依赖认证状态）
+  const loadCachedDataImmediately = () => {
+    console.log('立即加载缓存数据，不等待认证...');
+    const cachedData = backgroundStorage.getBackgroundData();
+    if (cachedData) {
+      console.log('找到缓存数据，立即使用');
+      setBackgroundImage(cachedData.background_image);
+      setBackgroundOpacity(cachedData.background_opacity);
+      setCacheInfo(backgroundStorage.getCacheInfo());
+    } else {
+      console.log('没有找到缓存数据');
+    }
+  };
 
   const value: BackgroundContextType = {
     backgroundImage,
