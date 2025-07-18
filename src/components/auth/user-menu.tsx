@@ -6,11 +6,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, LogOut, Settings, ImageIcon } from 'lucide-react';
+import { User, LogOut, Settings, ImageIcon, Database } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AiConfigManager } from '@/components/ai-config/ai-config-manager';
 import { BackgroundSettings } from '@/components/auth/background-settings';
+import { CacheManagement } from '@/components/auth/cache-management';
 
 export function UserMenu() {
   const { user, logout } = useAuth();
@@ -97,6 +98,21 @@ export function UserMenu() {
                     <DialogTitle>背景图设置</DialogTitle>
                   </DialogHeader>
                   <BackgroundSettings />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/10 rounded-md">
+                    <Database className="mr-2 h-4 w-4" />
+                    <span>缓存管理</span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[700px]">
+                  <DialogHeader>
+                    <DialogTitle>缓存管理</DialogTitle>
+                  </DialogHeader>
+                  <CacheManagement />
                 </DialogContent>
               </Dialog>
 

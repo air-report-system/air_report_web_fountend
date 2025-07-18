@@ -9,8 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, Trash2, ImageIcon, Sliders, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, Trash2, ImageIcon, Sliders, AlertCircle, CheckCircle, HardDrive, Clock } from 'lucide-react';
 import { authApi } from '@/lib/api';
+import { backgroundStorage } from '@/lib/background-storage';
+import { useBackground } from '@/contexts/background-context';
 
 interface BackgroundSettings {
   background_image: string | null;
@@ -18,6 +20,7 @@ interface BackgroundSettings {
 }
 
 export function BackgroundSettings() {
+  const { cacheInfo, clearCache } = useBackground();
   const [settings, setSettings] = useState<BackgroundSettings>({
     background_image: null,
     background_opacity: 0.1
@@ -74,15 +77,21 @@ export function BackgroundSettings() {
             background_image: base64String,
             background_opacity: settings.background_opacity
           });
-          
+
           setSettings({
             background_image: response.data.background_image,
             background_opacity: response.data.background_opacity
           });
-          
+
+          // 保存到localStorage，用户上传的图片需要压缩
+          await backgroundStorage.saveBackgroundData({
+            background_image: response.data.background_image,
+            background_opacity: response.data.background_opacity
+          });
+
           // 发送事件通知全局背景组件更新
           window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
-          
+
           showMessage('success', '背景图上传成功');
         } catch (error: any) {
           const errorMessage = error.response?.data?.background_image?.[0] || 
@@ -110,7 +119,13 @@ export function BackgroundSettings() {
         ...prev,
         background_opacity: response.data.background_opacity
       }));
-      
+
+      // 更新localStorage，透明度更新不需要压缩
+      await backgroundStorage.saveBackgroundData({
+        background_image: settings.background_image,
+        background_opacity: response.data.background_opacity
+      }, { skipCompression: true });
+
       // 发送事件通知全局背景组件更新
       window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
     } catch (error: any) {
@@ -130,10 +145,13 @@ export function BackgroundSettings() {
         background_image: null,
         background_opacity: 0.1
       });
-      
+
+      // 清理localStorage缓存
+      backgroundStorage.clearCache();
+
       // 发送事件通知全局背景组件更新
       window.dispatchEvent(new CustomEvent('backgroundSettingsUpdate'));
-      
+
       showMessage('success', '背景图删除成功');
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || '删除失败';
@@ -190,14 +208,60 @@ export function BackgroundSettings() {
         {/* 消息提示 */}
         {message && (
           <Alert className={message.type === 'error' ? 'border-white/50' : 'border-white/50'}>
-            {message.type === 'error' ? 
-              <AlertCircle className="h-4 w-4 text-red-600" /> : 
+            {message.type === 'error' ?
+              <AlertCircle className="h-4 w-4 text-red-600" /> :
               <CheckCircle className="h-4 w-4 text-green-600" />
             }
             <AlertDescription className={message.type === 'error' ? 'text-red-800' : 'text-green-800'}>
               {message.text}
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* 缓存信息 */}
+        {cacheInfo.hasCache && (
+          <div className="bg-white/10 border border-white/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="flex items-center gap-2 text-gray-900 text-sm font-medium">
+                <HardDrive className="h-4 w-4" />
+                本地缓存信息
+              </Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearCache}
+                className="text-xs"
+              >
+                清理缓存
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>缓存时间: {cacheInfo.cacheAge}</span>
+              </div>
+              <div>
+                <span>数据大小: {cacheInfo.dataSize}</span>
+              </div>
+              {cacheInfo.compressed && (
+                <>
+                  <div>
+                    <span>已压缩: 是</span>
+                  </div>
+                  {cacheInfo.compressionRatio && (
+                    <div>
+                      <span>压缩率: {cacheInfo.compressionRatio}</span>
+                    </div>
+                  )}
+                </>
+              )}
+              <div className="col-span-2">
+                <span className={cacheInfo.isExpired ? 'text-orange-600' : 'text-green-600'}>
+                  状态: {cacheInfo.isExpired ? '已过期' : '有效'}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* 当前背景图预览 */}

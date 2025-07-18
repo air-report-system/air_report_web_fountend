@@ -455,3 +455,39 @@ export function getApiBaseUrl(): string {
   // 在开发环境中，使用环境变量或默认localhost
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 }
+
+/**
+ * 检查是否支持 localStorage
+ */
+export function isLocalStorageAvailable(): boolean {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 获取localStorage使用情况
+ */
+export function getLocalStorageUsage(): { used: number; total: number; percentage: number } {
+  if (!isLocalStorageAvailable()) {
+    return { used: 0, total: 0, percentage: 0 };
+  }
+
+  let used = 0;
+  for (const key in localStorage) {
+    if (localStorage.hasOwnProperty(key)) {
+      used += localStorage[key].length + key.length;
+    }
+  }
+
+  // localStorage通常限制为5-10MB，这里使用5MB作为估算
+  const total = 5 * 1024 * 1024; // 5MB in bytes
+  const percentage = Math.round((used / total) * 100);
+
+  return { used, total, percentage };
+}
