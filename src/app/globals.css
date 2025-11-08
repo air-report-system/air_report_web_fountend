@@ -47,6 +47,49 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
   }
+
+  .text-gray-900,
+  .text-gray-800 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .text-gray-700,
+  .text-gray-600,
+  .text-gray-500,
+  .text-gray-400 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .border-white\/50,
+  .border-white\/30,
+  .border-white\/20,
+  .border-white\/10 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  .border-blue-500\/50 {
+    border-color: hsl(var(--primary)) !important;
+  }
+
+  .border-red-500\/50 {
+    border-color: hsl(var(--destructive)) !important;
+  }
+
+  .bg-white\/10 {
+    background-color: hsl(var(--muted) / 0.12) !important;
+  }
+
+  .hover\:bg-white\/10:hover {
+    background-color: hsl(var(--muted) / 0.2) !important;
+  }
+
+  .text-blue-600 {
+    color: hsl(var(--primary)) !important;
+  }
+
+  .text-red-600 {
+    color: hsl(var(--destructive)) !important;
+  }
 }
 
 * {

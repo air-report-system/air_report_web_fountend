@@ -54,7 +54,7 @@ function MainApp() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
+          <p className="text-muted-foreground">加载中...</p>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ function MainApp() {
                   height={40}
                   className="h-10 w-10"
                 />
-                <h1 className="ml-3 text-xl font-semibold text-gray-900">
+                <h1 className="ml-3 text-xl font-semibold text-foreground">
                   室内空气检测数据处理系统
                 </h1>
               </div>
@@ -99,8 +99,8 @@ function MainApp() {
 
         {/* 通知栏 */}
         {notification && (
-          <div className={`fixed top-20 right-4 z-50 p-4 rounded-lg border ${notification.type === 'success' ? 'text-green-800 border-white/50' :
-              'text-red-800 border-white/50'
+          <div className={`fixed top-20 right-4 z-50 p-4 rounded-lg border ${notification.type === 'success' ? 'text-green-400 border-border bg-muted/40' :
+              'text-red-400 border-border bg-muted/40'
             }`}
           >
             {notification.message}
@@ -111,19 +111,19 @@ function MainApp() {
         <div className="flex relative">
           {/* 侧边导航栏 */}
           <nav
-            className={`${isNavCollapsed ? 'w-16' : 'w-64'} border-r border-white/50 min-h-[calc(100vh-4rem)] transition-all duration-300 relative z-10`}
+            className={`${isNavCollapsed ? 'w-16' : 'w-64'} border-r border-border bg-background/80 backdrop-blur min-h-[calc(100vh-4rem)] transition-all duration-300 relative z-10`}
           >
             {/* 折叠按钮 */}
-            <div className="p-4 border-b border-white/50">
+            <div className="p-4 border-b border-border">
               <button
                 onClick={() => setIsNavCollapsed(!isNavCollapsed)}
-                className="w-full flex items-center justify-center p-2 rounded-md hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-center p-2 rounded-md hover:bg-muted/20 transition-colors"
                 title={isNavCollapsed ? '展开菜单' : '折叠菜单'}
               >
                 {isNavCollapsed ? (
-                  <ChevronsRight className="h-5 w-5 text-gray-800" />
+                  <ChevronsRight className="h-5 w-5 text-muted-foreground" />
                 ) : (
-                  <ChevronsLeft className="h-5 w-5 text-gray-800" />
+                  <ChevronsLeft className="h-5 w-5 text-muted-foreground" />
                 )}
               </button>
             </div>
@@ -133,8 +133,8 @@ function MainApp() {
               <button
                 onClick={() => setActiveTab('ocr')}
                 className={`w-full flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-start'} px-3 py-3 text-sm font-medium rounded-md transition-colors ${activeTab === 'ocr'
-                  ? 'text-gray-900 border border-white/50'
-                  : 'text-gray-800 hover:bg-white/10'
+                  ? 'text-foreground border border-border bg-muted/30'
+                  : 'text-muted-foreground hover:bg-muted/20'
                   }`}
                 title="OCR图片处理"
               >
@@ -145,8 +145,8 @@ function MainApp() {
               <button
                 onClick={() => setActiveTab('reports')}
                 className={`w-full flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-start'} px-3 py-3 mt-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'reports'
-                  ? 'text-gray-900 border border-white/50'
-                  : 'text-gray-800 hover:bg-white/10'
+                  ? 'text-foreground border border-border bg-muted/30'
+                  : 'text-muted-foreground hover:bg-muted/20'
                   }`}
                 title="报告生成"
               >
@@ -157,8 +157,8 @@ function MainApp() {
               <button
                 onClick={() => setActiveTab('monthly')}
                 className={`w-full flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-start'} px-3 py-3 mt-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'monthly'
-                  ? 'text-gray-900 border border-white/50'
-                  : 'text-gray-800 hover:bg-white/10'
+                  ? 'text-foreground border border-border bg-muted/30'
+                  : 'text-muted-foreground hover:bg-muted/20'
                   }`}
                 title="月度报表"
               >
@@ -169,8 +169,8 @@ function MainApp() {
               <button
                 onClick={() => setActiveTab('batch')}
                 className={`w-full flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-start'} px-3 py-3 mt-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'batch'
-                  ? 'text-gray-900 border border-white/50'
-                  : 'text-gray-800 hover:bg-white/10'
+                  ? 'text-foreground border border-border bg-muted/30'
+                  : 'text-muted-foreground hover:bg-muted/20'
                   }`}
                 title="批量处理"
               >
@@ -181,8 +181,8 @@ function MainApp() {
               <button
                 onClick={() => setActiveTab('orders')}
                 className={`w-full flex items-center ${isNavCollapsed ? 'justify-center' : 'justify-start'} px-3 py-3 mt-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'orders'
-                  ? 'text-gray-900 border border-white/50'
-                  : 'text-gray-800 hover:bg-white/10'
+                  ? 'text-foreground border border-border bg-muted/30'
+                  : 'text-muted-foreground hover:bg-muted/20'
                   }`}
                 title="订单管理"
               >
@@ -198,15 +198,13 @@ function MainApp() {
 
               {/* OCR图片处理 */}
               <TabsContent value="ocr" className="mt-0 p-6">
-                <Card
-                  className="border border-white/50"
-                >
-                  <CardHeader className="border-b border-white/50">
-                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Card>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="flex items-center gap-2 text-foreground">
                       <Upload className="h-5 w-5" />
                       OCR图片处理
                     </CardTitle>
-                    <CardDescription className="text-gray-800">
+                    <CardDescription className="text-muted-foreground">
                       上传检测报告图片，自动识别并提取数据结构化信息
                     </CardDescription>
                   </CardHeader>
@@ -222,15 +220,13 @@ function MainApp() {
 
               {/* 报告生成 */}
               <TabsContent value="reports" className="mt-0 p-6">
-                <Card
-                  className="border border-white/50"
-                >
-                  <CardHeader className="border-b border-white/50">
-                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Card>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="flex items-center gap-2 text-foreground">
                       <FileText className="h-5 w-5" />
                       报告生成
                     </CardTitle>
-                    <CardDescription className="text-gray-800">
+                    <CardDescription className="text-muted-foreground">
                       基于OCR识别结果，生成标准格式的检测报告
                     </CardDescription>
                   </CardHeader>
@@ -247,15 +243,13 @@ function MainApp() {
               {/* 月度报表 */}
               <TabsContent value="monthly" className="mt-0 p-6">
                 <div className="space-y-6">
-                  <Card
-                    className="border border-white/50"
-                  >
-                    <CardHeader className="border-b border-white/50">
-                      <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Card>
+                    <CardHeader className="border-b border-border">
+                      <CardTitle className="flex items中心 gap-2 text-foreground">
                         <BarChart3 className="h-5 w-5" />
                         月度报表生成
                       </CardTitle>
-                      <CardDescription className="text-gray-800">
+                      <CardDescription className="text-muted-foreground">
                         上传CSV数据文件，生成标准格式的月度统计报表
                       </CardDescription>
                     </CardHeader>
@@ -267,12 +261,10 @@ function MainApp() {
                     </CardContent>
                   </Card>
 
-                  <Card
-                    className="border border-white/50"
-                  >
-                    <CardHeader className="border-b border-white/50">
-                      <CardTitle className="text-gray-900">数据库月度报表</CardTitle>
-                      <CardDescription className="text-gray-800">
+                  <Card>
+                    <CardHeader className="border-b border-border">
+                      <CardTitle className="text-foreground">数据库月度报表</CardTitle>
+                      <CardDescription className="text-muted-foreground">
                         基于系统数据库中的OCR记录生成月度报表
                       </CardDescription>
                     </CardHeader>
@@ -288,15 +280,13 @@ function MainApp() {
 
               {/* 批量处理 */}
               <TabsContent value="batch" className="mt-0 p-6">
-                <Card
-                  className="border border-white/50"
-                >
-                  <CardHeader className="border-b border-white/50">
-                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Card>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="flex items-center gap-2 text-foreground">
                       <Settings className="h-5 w-5" />
                       批量处理
                     </CardTitle>
-                    <CardDescription className="text-gray-800">
+                    <CardDescription className="text-muted-foreground">
                       批量上传图片进行OCR识别和报告生成，支持并行处理
                     </CardDescription>
                   </CardHeader>
@@ -311,15 +301,13 @@ function MainApp() {
 
               {/* 订单管理 */}
               <TabsContent value="orders" className="mt-0 p-6">
-                <Card
-                  className="border border-white/50"
-                >
-                  <CardHeader className="border-b border-white/50">
-                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Card>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="flex items-center gap-2 text-foreground">
                       <ShoppingCart className="h-5 w-5" />
                       订单管理
                     </CardTitle>
-                    <CardDescription className="text-gray-800">
+                    <CardDescription className="text-muted-foreground">
                       处理和管理检测订单，支持批量操作和数据导出
                     </CardDescription>
                   </CardHeader>
