@@ -142,10 +142,6 @@ export function OrderRecordsList({ onEdit: _onEdit, onDelete, onError }: OrderRe
     // fetchVersion 用于在筛选条件未改变时强制刷新
   }, [fetchRecords, fetchVersion]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedMonth]);
-
   const triggerFetch = () => setFetchVersion((prev) => prev + 1);
 
   const handlePageChange = (page: number) => {
