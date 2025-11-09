@@ -3,7 +3,7 @@
  */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -30,8 +30,14 @@ import {
   MapPin,
   Package
 } from 'lucide-react';
-import { getApiBaseUrl } from '@/lib/utils';
 import { OrderEditDialog } from './order-edit-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface OrderRecord {
   id: number;
@@ -54,7 +60,7 @@ interface OrderRecordsListProps {
   onError?: (error: string) => void;
 }
 
-export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsListProps) {
+export function OrderRecordsList({ onEdit: _onEdit, onDelete, onError }: OrderRecordsListProps) {
   const [records, setRecords] = useState<OrderRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchName, setSearchName] = useState('');
@@ -67,37 +73,110 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
   const [selectedRecord, setSelectedRecord] = useState<OrderRecord | null>(null);
   const [editingRecord, setEditingRecord] = useState<OrderRecord | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const [fetchVersion, setFetchVersion] = useState(0);
+  const [appliedFilters, setAppliedFilters] = useState({
+    customerName: '',
+    customerPhone: ''
+  });
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
     setLoading(true);
     try {
       const { ordersApi } = await import('@/lib/api');
-      const params: { [key: string]: string } = {};
-      
-      if (searchName) params.customer_name = searchName;
-      if (searchPhone) params.customer_phone = searchPhone;
+      const params: Record<string, string | number> = {
+        page: currentPage,
+        page_size: pageSize
+      };
+
+      if (appliedFilters.customerName) params.customer_name = appliedFilters.customerName;
+      if (appliedFilters.customerPhone) params.customer_phone = appliedFilters.customerPhone;
       if (selectedMonth) params.fulfillment_month = selectedMonth;
 
       const response = await ordersApi.getRecords(params);
-      setRecords(response.data.results || response.data);
-    } catch (error) {
-      onError?.(error instanceof Error ? error.message : '获取记录失败');
+      const data = response.data;
+
+      if (Array.isArray(data)) {
+        setRecords(data as OrderRecord[]);
+        setTotalCount(data.length);
+        setHasNextPage(false);
+        setHasPreviousPage(currentPage > 1);
+      } else {
+        const results = (data?.results as OrderRecord[]) || [];
+        const count = typeof data?.count === 'number' ? data.count : results.length;
+
+        if (!results.length && count > 0 && currentPage > 1) {
+          setCurrentPage((prev) => Math.max(1, prev - 1));
+          setFetchVersion((prev) => prev + 1);
+          return;
+        }
+
+        setRecords(results);
+        setTotalCount(count);
+        setHasNextPage(Boolean(data?.next));
+        setHasPreviousPage(Boolean(data?.previous));
+      }
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 404 && currentPage > 1) {
+        setCurrentPage((prev) => Math.max(1, prev - 1));
+        setFetchVersion((prev) => prev + 1);
+        return;
+      }
+      if (error instanceof Error) {
+        onError?.(error.message);
+      } else {
+        onError?.('获取记录失败');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [appliedFilters, currentPage, onError, pageSize, selectedMonth]);
 
   useEffect(() => {
     fetchRecords();
-  }, []);
+    // fetchVersion 用于在筛选条件未改变时强制刷新
+  }, [fetchRecords, fetchVersion]);
 
-  // 当月份改变时自动搜索
   useEffect(() => {
-    fetchRecords();
+    setCurrentPage(1);
   }, [selectedMonth]);
 
+  const triggerFetch = () => setFetchVersion((prev) => prev + 1);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page === currentPage) return;
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    const size = Number(value);
+    if (!Number.isNaN(size)) {
+      setPageSize(size);
+      setCurrentPage(1);
+    }
+  };
+
   const handleSearch = () => {
-    fetchRecords();
+    setAppliedFilters({
+      customerName: searchName.trim(),
+      customerPhone: searchPhone.trim()
+    });
+    setCurrentPage(1);
+    triggerFetch();
+  };
+
+  const handleMonthChange = (value: string) => {
+    if (value === selectedMonth) {
+      triggerFetch();
+    } else {
+      setSelectedMonth(value);
+    }
+    setCurrentPage(1);
   };
 
   const handleDeleteRecord = async (record: OrderRecord) => {
@@ -123,11 +202,11 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
     setShowEditDialog(true);
   };
 
-  const handleEditSuccess = (updatedRecord: OrderRecord) => {
+  const handleEditSuccess = () => {
     // 刷新列表
     fetchRecords();
     // 移除自动跳转，编辑完成后留在当前页面
-    // onEdit?.(updatedRecord);
+    // onEdit?.(_updatedRecord);
   };
 
   const handleCloseEditDialog = () => {
@@ -146,7 +225,9 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
   };
 
   // 格式化JSON显示 - 特别针对备注赠品字段
-  const formatGiftsDisplay = (giftsData: any) => {
+  const formatGiftsDisplay = (
+    giftsData: Record<string, unknown> | string | null | undefined
+  ) => {
     if (!giftsData) return '-';
 
     // 如果已经是对象，直接格式化
@@ -166,6 +247,10 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
 
     return String(giftsData);
   };
+
+  const totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
+
+  void _onEdit;
 
   return (
     <div className="space-y-6">
@@ -209,7 +294,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                   id="search-month"
                   type="month"
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  onChange={(e) => handleMonthChange(e.target.value)}
                   className="flex-1"
                 />
                 <div className="flex gap-1">
@@ -218,7 +303,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                     size="sm"
                     onClick={() => {
                       const now = new Date();
-                      setSelectedMonth(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+                      handleMonthChange(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
                     }}
                     className="text-xs whitespace-nowrap"
                   >
@@ -230,7 +315,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                     onClick={() => {
                       const lastMonth = new Date();
                       lastMonth.setMonth(lastMonth.getMonth() - 1);
-                      setSelectedMonth(`${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`);
+                      handleMonthChange(`${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`);
                     }}
                     className="text-xs whitespace-nowrap"
                   >
@@ -239,7 +324,7 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedMonth('')}
+                    onClick={() => handleMonthChange('')}
                     className="text-xs whitespace-nowrap"
                   >
                     全部
@@ -266,20 +351,23 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
         <CardHeader>
           <CardTitle>订单记录列表</CardTitle>
           <CardDescription>
-            {selectedMonth ? (
-              <>
-                {selectedMonth} 月份共找到 {records.length} 条记录
-                {records.length > 0 && (
-                  <span className="ml-4 text-sm text-gray-500">
-                    总金额: ¥{records.reduce((sum, record) => {
-                      const amount = parseFloat(record.成交金额) || 0;
-                      return sum + amount;
-                    }, 0).toLocaleString()}
-                  </span>
-                )}
-              </>
-            ) : (
-              `共找到 ${records.length} 条记录`
+            {selectedMonth
+              ? `${selectedMonth} 月份共找到 ${totalCount} 条记录`
+              : `共找到 ${totalCount} 条记录`}
+            {totalCount > 0 && (
+              <span className="ml-4 text-sm text-gray-500">
+                当前第 {Math.min(currentPage, totalPages)} / {totalPages} 页，显示 {records.length} 条
+              </span>
+            )}
+            {records.length > 0 && (
+              <span className="ml-4 text-sm text-gray-500">
+                当前页总金额: ¥{records
+                  .reduce((sum, record) => {
+                    const amount = parseFloat(record.成交金额) || 0;
+                    return sum + amount;
+                  }, 0)
+                  .toLocaleString()}
+              </span>
             )}
           </CardDescription>
         </CardHeader>
@@ -424,6 +512,44 @@ export function OrderRecordsList({ onEdit, onDelete, onError }: OrderRecordsList
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {records.length > 0 && (
+            <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="text-sm text-gray-600">
+                共 {totalCount} 条，当前第 {Math.min(currentPage, totalPages)} / {totalPages} 页
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select
+                  value={String(pageSize)}
+                  onValueChange={handlePageSizeChange}
+                >
+                  <SelectTrigger className="w-[140px]" disabled={loading}>
+                    <SelectValue placeholder="每页条数" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">每页 10 条</SelectItem>
+                    <SelectItem value="20">每页 20 条</SelectItem>
+                    <SelectItem value="50">每页 50 条</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={loading || !hasPreviousPage}
+                >
+                  上一页
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={loading || !hasNextPage}
+                >
+                  下一页
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
