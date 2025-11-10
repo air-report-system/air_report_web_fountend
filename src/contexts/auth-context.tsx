@@ -39,23 +39,62 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
-      // 从 localStorage 获取缓存的用户信息
+      // 从 localStorage 获取缓存的用户信息（用于快速渲染）
       const cachedUser = localStorage.getItem('user_info');
       if (cachedUser) {
         try {
           const userData = JSON.parse(cachedUser);
           setUser(userData);
+          setIsLoading(false); // 立即完成加载状态
+          
+          // 在后台静默刷新用户信息以确保数据一致性
+          authApi.getProfile()
+            .then(response => {
+              const freshUser = response.data;
+              // 合并数据：保留缓存中存在但新数据中缺失的字段（如 first_name）
+              const mergedUser = { ...userData, ...freshUser };
+              // 更新缓存和状态
+              localStorage.setItem('user_info', JSON.stringify(mergedUser));
+              setUser(mergedUser);
+            })
+            .catch(error => {
+              console.error('后台刷新用户信息失败:', error);
+              // 如果是认证失败，清除本地状态
+              if (error.response?.status === 401 || error.response?.status === 403) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_info');
+                setUser(null);
+              }
+              // 其他错误（如网络问题）时，继续使用缓存数据
+            });
         } catch (e) {
           console.error('解析缓存用户信息失败:', e);
-          // 如果解析失败,清除无效的缓存
-          localStorage.removeItem('auth_token');
+          // 如果解析失败,清除无效的缓存并尝试从服务器获取
           localStorage.removeItem('user_info');
-          setUser(null);
+          // 直接从服务器获取用户信息
+          try {
+            const response = await authApi.getProfile();
+            const freshUser = response.data;
+            localStorage.setItem('user_info', JSON.stringify(freshUser));
+            setUser(freshUser);
+          } catch (apiError: any) {
+            console.error('从服务器获取用户信息失败:', apiError);
+            localStorage.removeItem('auth_token');
+            setUser(null);
+          }
         }
       } else {
-        // 如果没有缓存的用户信息但有 token,说明数据不一致,清除 token
-        localStorage.removeItem('auth_token');
-        setUser(null);
+        // 如果没有缓存的用户信息但有 token,从服务器获取
+        try {
+          const response = await authApi.getProfile();
+          const freshUser = response.data;
+          localStorage.setItem('user_info', JSON.stringify(freshUser));
+          setUser(freshUser);
+        } catch (apiError: any) {
+          console.error('从服务器获取用户信息失败:', apiError);
+          localStorage.removeItem('auth_token');
+          setUser(null);
+        }
       }
     } catch (error: any) {
       console.error('检查认证状态失败:', error);

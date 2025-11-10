@@ -539,10 +539,10 @@ export const authApi = {
   logout: () => api.post('/auth/logout/'),
 
   // 获取用户信息
-  getProfile: () => api.get<User>('/auth/users/me/'),
+  getProfile: () => api.get<User>('/auth/profile/'),
 
   // 检查认证状态
-  checkAuth: () => api.get('/auth/users/me/'),
+  checkAuth: () => api.get('/auth/profile/'),
 
   // 背景图管理
   backgroundImage: {

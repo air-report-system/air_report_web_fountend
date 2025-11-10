@@ -18,9 +18,9 @@ export function UserMenu() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  // 调试日志 - 查看用户信息
+  // 调试日志 - 仅在开发环境查看用户信息
   React.useEffect(() => {
-    if (user) {
+    if (process.env.NODE_ENV === 'development' && user) {
       console.log('UserMenu - 当前用户信息:', user);
       console.log('UserMenu - username:', user.username);
       console.log('UserMenu - first_name:', user.first_name);
