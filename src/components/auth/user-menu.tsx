@@ -18,6 +18,16 @@ export function UserMenu() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
+  // 调试日志 - 查看用户信息
+  React.useEffect(() => {
+    if (user) {
+      console.log('UserMenu - 当前用户信息:', user);
+      console.log('UserMenu - username:', user.username);
+      console.log('UserMenu - first_name:', user.first_name);
+      console.log('UserMenu - email:', user.email);
+    }
+  }, [user]);
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -46,7 +56,7 @@ export function UserMenu() {
           </div>
           <div className="text-xs text-gray-500 flex items-center gap-1">
             <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
-              {user.role === 'admin' ? '管理员' : '用户'}
+              {user.role === 'admin' ? '管理员' : user.role === 'operator' ? '操作员' : '查看员'}
             </Badge>
           </div>
         </div>
@@ -64,10 +74,10 @@ export function UserMenu() {
           <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/50 z-50">
             <div className="p-3 border-b border-white/50">
               <p className="text-sm font-medium text-gray-900">
-                你好, {user.username}
+                你好, {user.first_name || user.username || user.email || '用户'}
               </p>
               <p className="text-xs text-gray-600">
-                {user.email}
+                {user.email || user.username}
               </p>
             </div>
             <div className="py-1">

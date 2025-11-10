@@ -62,7 +62,7 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'operator' | 'viewer';
   is_active: boolean;
   date_joined: string;
 }
@@ -539,10 +539,10 @@ export const authApi = {
   logout: () => api.post('/auth/logout/'),
 
   // 获取用户信息
-  getProfile: () => api.get<User>('/auth/profile/'),
+  getProfile: () => api.get<User>('/auth/users/me/'),
 
   // 检查认证状态
-  checkAuth: () => api.get('/auth/profile/'),
+  checkAuth: () => api.get('/auth/users/me/'),
 
   // 背景图管理
   backgroundImage: {

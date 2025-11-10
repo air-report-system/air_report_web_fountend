@@ -34,17 +34,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const token = localStorage.getItem('auth_token');
       if (!token) {
+        setUser(null);
         setIsLoading(false);
         return;
       }
 
-      const response = await authApi.getProfile();
-      setUser(response.data);
+      // 从 localStorage 获取缓存的用户信息
+      const cachedUser = localStorage.getItem('user_info');
+      if (cachedUser) {
+        try {
+          const userData = JSON.parse(cachedUser);
+          setUser(userData);
+        } catch (e) {
+          console.error('解析缓存用户信息失败:', e);
+          // 如果解析失败,清除无效的缓存
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_info');
+          setUser(null);
+        }
+      } else {
+        // 如果没有缓存的用户信息但有 token,说明数据不一致,清除 token
+        localStorage.removeItem('auth_token');
+        setUser(null);
+      }
     } catch (error: any) {
       console.error('检查认证状态失败:', error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        localStorage.removeItem('auth_token');
-      }
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -60,6 +76,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // 保存Token到localStorage
       if (response.data.token) {
         localStorage.setItem('auth_token', response.data.token);
+      }
+
+      // 保存用户信息到 localStorage
+      if (response.data.user) {
+        localStorage.setItem('user_info', JSON.stringify(response.data.user));
       }
 
       setUser(response.data.user);
@@ -81,6 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('登出请求失败:', error);
     } finally {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
       setUser(null);
     }
   };
