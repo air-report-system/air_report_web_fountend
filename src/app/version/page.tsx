@@ -43,7 +43,7 @@ export default async function VersionPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <div className="rounded-lg shadow-md p-6 border border-white/30" style={{ backdropFilter: 'blur(4px)' }}>
+        <div className="rounded-lg shadow-md p-6 border ui-surface ui-border" style={{ backdropFilter: 'blur(4px)' }}>
           <h1 className="text-2xl font-bold text-gray-800 mb-6">
             🚀 前端版本信息
           </h1>
@@ -101,7 +101,7 @@ export default async function VersionPage() {
             </p>
           </div>
           
-          <div className="mt-4 p-4 border border-white/30 rounded-lg">
+          <div className="mt-4 p-4 border ui-surface-subtle ui-border rounded-lg">
             <h3 className="font-semibold text-blue-800 mb-2">🔍 后端版本检查</h3>
             <p className="text-sm text-blue-700 mb-2">
               点击下方链接检查后端版本信息：
@@ -116,7 +116,7 @@ export default async function VersionPage() {
             </a>
           </div>
           
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 border ui-surface-subtle ui-border rounded-lg">
             <h3 className="font-semibold text-gray-800 mb-2">⚡ 快速操作</h3>
             <div className="space-y-2 text-sm">
               <div>

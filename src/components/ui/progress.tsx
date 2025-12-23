@@ -22,7 +22,7 @@ export function Progress({
   return (
     <div
       className={cn(
-        'relative h-2 w-full overflow-hidden rounded-full border border-white/30',
+        'relative h-2 w-full overflow-hidden rounded-full border ui-border',
         className
       )}
     >

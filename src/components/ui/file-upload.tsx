@@ -140,7 +140,7 @@ export function FileUpload({
         {...getRootProps()}
         className={cn(
           'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors',
-          isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-gray-400',
+          isDragActive ? 'border-primary bg-primary/5' : 'ui-border',
           disabled && 'cursor-not-allowed opacity-50'
         )}
       >
@@ -189,7 +189,7 @@ export function FileUpload({
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 border border-white/30 rounded-md"
+                className="flex items-center justify-between p-3 border ui-surface-subtle ui-border rounded-md"
               >
                 <div className="flex items-center space-x-3">
                   {getFileIcon(file)}

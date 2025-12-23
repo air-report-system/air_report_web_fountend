@@ -229,7 +229,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
         </div>
 
         {/* 配置选项 */}
-        <div className="space-y-4 p-4 border border-white/30 rounded-lg">
+        <div className="space-y-4 p-4 border ui-surface-subtle ui-border rounded-lg">
           <h4 className="font-medium text-gray-900 flex items-center gap-2">
             <Settings className="h-4 w-4" />
             报表配置
@@ -383,7 +383,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
         <Button
           onClick={handleGenerateReport}
           disabled={isLoading}
-          className="w-full bg-transparent border border-blue-500/50 hover:bg-white/10 text-gray-900"
+          className="w-full bg-transparent border border-blue-500/50 hover:bg-muted/20 text-gray-900"
         >
           {isLoading ? (
             <>
@@ -410,7 +410,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
                 onClick={handleDownloadReport}
                 variant="outline"
                 size="sm"
-                className="text-green-700 border-green-500/50 hover:bg-white/10"
+                className="text-green-700 border-green-500/50 hover:bg-muted/20"
               >
                 <Download className="h-4 w-4 mr-2" />
                 下载报表
@@ -457,7 +457,7 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
 
         {/* 预览区域 */}
         {!generatedReport && (
-          <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+          <div className="p-4 border-2 border-dashed ui-surface-subtle ui-border rounded-lg text-center">
             <Database className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-gray-500 mb-2">报表预览区域</p>
             <p className="text-sm text-gray-400">

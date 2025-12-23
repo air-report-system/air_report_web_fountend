@@ -212,7 +212,7 @@ export function OrderEditDialog({
                 id="商品类型"
                 value={formData.商品类型 || ''}
                 onChange={(e) => handleInputChange('商品类型', e.target.value)}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full px-3 py-2 border ui-border rounded-md bg-[hsl(var(--background)/var(--ui-input-alpha))] focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">请选择</option>
                 <option value="国标">国标</option>

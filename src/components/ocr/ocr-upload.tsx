@@ -238,7 +238,7 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
           </Button>
 
           {showAdvanced && (
-            <div className="mt-4 p-4 border rounded-lg border-white/30 space-y-4">
+            <div className="mt-4 p-4 border rounded-lg ui-surface-subtle ui-border space-y-4">
               {/* 多重OCR设置 */}
               <div className="flex items-center space-x-3">
                 <input
@@ -246,7 +246,7 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
                   id="useMultiOcr"
                   checked={useMultiOcr}
                   onChange={(e) => setUseMultiOcr(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border ui-border rounded"
                 />
                 <label htmlFor="useMultiOcr" className="text-sm font-medium text-gray-700">
                   启用多重OCR（提高识别准确性）
@@ -293,7 +293,7 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
 
         {/* 轮询状态显示 */}
         {pollingOcrId && (
-          <div className="p-3 border border-white/30 rounded-lg">
+          <div className="p-3 border ui-surface-subtle ui-border rounded-lg">
             <div className="flex items-center gap-2 text-gray-800">
               <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
               <span className="font-medium">{pollingStatus}</span>
@@ -328,7 +328,7 @@ export function OCRUpload({ onSuccess, onError, onOCRComplete }: OCRUploadProps)
         </div>
 
         {/* 处理说明 */}
-        <div className="text-sm text-gray-800 p-3 rounded-lg border border-white/30">
+        <div className="text-sm text-gray-800 p-3 rounded-lg border ui-surface-subtle ui-border">
           <h4 className="font-medium text-gray-900 mb-2">处理流程说明：</h4>
           <ol className="list-decimal list-inside space-y-1 text-gray-800">
             <li>上传检测报告图片（支持JPG、PNG等格式）</li>

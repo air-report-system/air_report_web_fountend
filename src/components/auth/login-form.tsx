@@ -52,9 +52,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       {/* 全局背景图 */}
       <GlobalBackground />
       
-      <Card className="w-full max-w-md border border-white/50 relative z-10">
-        <CardHeader className="text-center border-b border-white/50">
-          <div className="mx-auto w-12 h-12 border border-white/50 rounded-full flex items-center justify-center mb-4">
+      <Card className="w-full max-w-md relative z-10">
+        <CardHeader className="text-center border-b ui-border">
+          <div className="mx-auto w-12 h-12 border ui-border rounded-full flex items-center justify-center mb-4">
             <LogIn className="h-6 w-6 text-blue-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
@@ -67,7 +67,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-800 border border-white/50 rounded-md">
+              <div className="flex items-center gap-2 p-3 text-sm text-red-800 border ui-surface-subtle ui-border rounded-md">
                 <AlertCircle className="h-4 w-4" />
                 <span>{error}</span>
               </div>
@@ -84,7 +84,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                   value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
                   placeholder="请输入用户名"
-                  className="pl-10 bg-white/20 border-white/50 text-gray-900 placeholder-gray-600"
+                  className="pl-10"
                   disabled={isLoading}
                   autoComplete="username"
                 />
@@ -102,7 +102,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   placeholder="请输入密码"
-                  className="pl-10 bg-white/20 border-white/50 text-gray-900 placeholder-gray-600"
+                  className="pl-10"
                   disabled={isLoading}
                   autoComplete="current-password"
                 />
@@ -111,7 +111,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600/80 hover:bg-blue-700/80 text-white border border-white/50"
+              className="w-full bg-blue-600/80 hover:bg-blue-700/80 text-white"
               disabled={isLoading}
             >
               {isLoading ? (

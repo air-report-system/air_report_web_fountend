@@ -130,8 +130,8 @@ export function BatchFileList({
           {fileItems.map((fileItem, index) => (
             <div
               key={fileItem.id}
-              className={`p-3 border-b cursor-pointer hover:bg-white/10 transition-colors border-white/20 ${
-                index === currentIndex ? 'bg-white/20 border-white/40' : ''
+              className={`p-3 border-b cursor-pointer hover:bg-muted/20 transition-colors ui-border ${
+                index === currentIndex ? 'bg-[hsl(var(--card)/var(--ui-surface-alpha))]' : ''
               }`}
               onClick={() => onSelectFile(index)}
             >
@@ -195,14 +195,14 @@ export function BatchFileList({
               
               {/* 错误信息 */}
               {fileItem.error_message && (
-                <div className="mt-2 text-xs text-red-600 border border-white/30 p-2 rounded">
+                <div className="mt-2 text-xs text-red-600 border ui-surface-subtle ui-border p-2 rounded">
                   {fileItem.error_message}
                 </div>
               )}
               
               {/* OCR结果预览 */}
               {fileItem.ocr_result && fileItem.status === 'completed' && (
-                <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                <div className="mt-2 text-xs text-gray-600 ui-surface-subtle border ui-border p-2 rounded">
                   <div className="grid grid-cols-2 gap-2">
                     <div>电话: {fileItem.ocr_result.phone || '未识别'}</div>
                     <div>日期: {fileItem.ocr_result.date || '未识别'}</div>

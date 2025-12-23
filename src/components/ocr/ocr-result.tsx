@@ -192,7 +192,7 @@ export function OCRResultDisplay({ result, onReprocess, onCreateReport }: OCRRes
             {showDetails ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(result.points_data).map(([point, value]) => (
-                  <div key={point} className="p-3 border border-white/30 rounded-lg">
+                  <div key={point} className="p-3 border ui-surface-subtle ui-border rounded-lg">
                     <div className="font-medium text-sm text-gray-900">{point}</div>
                     <div className="text-lg font-semibold text-blue-600">
                       {typeof value === 'number' ? formatToThreeDecimals(value) : value} mg/m³

@@ -248,7 +248,7 @@ export function BatchImagePreview({
           </div>
 
           {/* 图片控制工具栏 */}
-          <div className="flex items-center gap-2 p-2 border border-white/30 rounded-lg">
+          <div className="flex items-center gap-2 p-2 border ui-surface-subtle ui-border rounded-lg">
             <Button
               variant="ghost"
               size="sm"
@@ -299,7 +299,7 @@ export function BatchImagePreview({
           {/* 图片显示区域 */}
           <div
             ref={containerRef}
-            className="relative bg-white/10 rounded-lg overflow-hidden flex-1 border border-white/20"
+            className="relative ui-surface-subtle rounded-lg overflow-hidden flex-1 border ui-border"
             style={{ minHeight: '500px' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}

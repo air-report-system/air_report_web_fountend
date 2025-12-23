@@ -264,7 +264,7 @@ export function PointLearningTest() {
               <h4 className="font-medium">测试结果</h4>
               <div className="space-y-3">
                 {testResults.map((result, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
+                  <div key={index} className="p-4 border ui-surface-subtle ui-border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(result.status)}
@@ -280,7 +280,7 @@ export function PointLearningTest() {
                         <summary className="cursor-pointer text-gray-500">
                           查看详细数据
                         </summary>
-                        <pre className="mt-2 p-2 border border-white/30 rounded overflow-auto">
+                        <pre className="mt-2 p-2 border ui-surface-subtle ui-border rounded overflow-auto">
                           {JSON.stringify(result.data, null, 2)}
                         </pre>
                       </details>

@@ -73,7 +73,7 @@ function MainApp() {
 
         {/* 顶部导航 */}
         <header
-          className="border-b border-white/50 relative z-10"
+          className="border-b ui-border ui-surface relative z-10"
         >
           <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -111,7 +111,7 @@ function MainApp() {
         <div className="flex relative">
           {/* 侧边导航栏 */}
           <nav
-            className={`${isNavCollapsed ? 'w-16' : 'w-64'} border-r border-border bg-background/80 backdrop-blur min-h-[calc(100vh-4rem)] transition-all duration-300 relative z-10`}
+            className={`${isNavCollapsed ? 'w-16' : 'w-64'} border-r ui-border ui-surface min-h-[calc(100vh-4rem)] transition-all duration-300 relative z-10`}
           >
             {/* 折叠按钮 */}
             <div className="p-4 border-b border-border">

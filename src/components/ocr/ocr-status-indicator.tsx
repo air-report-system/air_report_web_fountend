@@ -4,7 +4,7 @@
 'use client';
 
 import React from 'react';
-import { AlertCircle, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface OCRStatusIndicatorProps {
@@ -66,7 +66,7 @@ export function OCRStatusIndicator({
   // 处理中状态
   if (isProcessing) {
     return (
-      <Alert className={`border-white/30 ${className}`}>
+      <Alert className={`ui-border ${className}`}>
         <Clock className="h-4 w-4 text-gray-800" />
         <AlertDescription className="text-gray-800 drop-shadow-sm">
           <div className="space-y-1">

@@ -311,7 +311,7 @@ export function BatchReportManager({
                   setFilterType(e.target.value as any);
                   resetToFirstPage();
                 }}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="border ui-border rounded-md px-3 py-2 text-sm bg-[hsl(var(--background)/var(--ui-input-alpha))]"
               >
                 <option value="all">全部报告</option>
                 <option value="generated">已生成</option>
@@ -321,7 +321,7 @@ export function BatchReportManager({
           </div>
 
           {/* 日期筛选 */}
-          <div className="flex items-center gap-4 p-3 border border-white/30 bg-transparent rounded-lg">
+          <div className="flex items-center gap-4 p-3 border ui-surface-subtle ui-border rounded-lg">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">创建时间:</span>
@@ -416,7 +416,7 @@ export function BatchReportManager({
         {/* 报告列表 */}
         <div className="space-y-2">
           {/* 表头 */}
-          <div className="flex items-center gap-4 p-3 border border-white/30 rounded-lg text-sm font-medium">
+          <div className="flex items-center gap-4 p-3 border ui-surface-subtle ui-border rounded-lg text-sm font-medium">
             <div className="w-8">
               <Checkbox
                 checked={selectedReports.length === reports.length && reports.length > 0}
@@ -444,7 +444,7 @@ export function BatchReportManager({
             reports.map((report: any) => (
               <div
                 key={report.id}
-                className="flex items-center gap-4 p-3 border rounded-lg hover:bg-white/10 border-white/30"
+                className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/20 ui-border"
               >
                 <div className="w-8">
                   <Checkbox
@@ -530,7 +530,7 @@ export function BatchReportManager({
               <select
                 value={pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                className="border ui-border rounded px-2 py-1 text-sm bg-[hsl(var(--background)/var(--ui-input-alpha))]"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>

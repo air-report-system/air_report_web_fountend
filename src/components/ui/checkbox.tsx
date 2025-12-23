@@ -31,7 +31,7 @@ export function Checkbox({
       onChange={handleChange}
       disabled={disabled}
       className={cn(
-        'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2',
+        'h-4 w-4 rounded border ui-border text-blue-600 focus:ring-blue-500 focus:ring-2',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}

@@ -385,12 +385,12 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
                 {currentBatchJob.name}
                 {/* WebSocket连接状态指示器 */}
                 {isConnected ? (
-                  <Badge variant="outline" className="text-green-700 border-white/50">
+                  <Badge variant="outline" className="text-green-700 ui-border">
                     <Wifi className="h-3 w-3 mr-1" />
                     实时连接
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-yellow-700 border-white/50">
+                  <Badge variant="outline" className="text-yellow-700 ui-border">
                     <WifiOff className="h-3 w-3 mr-1" />
                     轮询模式
                   </Badge>
@@ -463,19 +463,19 @@ export function BatchProcessor({ onSuccess, onError, onBatchJobCreated }: BatchP
 
             {/* 任务统计 */}
             <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 border border-white/50 rounded-lg">
+              <div className="p-3 border ui-surface-subtle ui-border rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {currentBatchJob.processed_files - currentBatchJob.failed_files}
                 </div>
                 <div className="text-sm text-green-600">已完成</div>
               </div>
-              <div className="p-3 border border-white/50 rounded-lg">
+              <div className="p-3 border ui-surface-subtle ui-border rounded-lg">
                 <div className="text-2xl font-bold text-red-600">
                   {currentBatchJob.failed_files}
                 </div>
                 <div className="text-sm text-red-600">失败</div>
               </div>
-              <div className="p-3 border border-white/50 rounded-lg">
+              <div className="p-3 border ui-surface-subtle ui-border rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
                   {currentBatchJob.total_files - currentBatchJob.processed_files}
                 </div>

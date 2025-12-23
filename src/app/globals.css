@@ -23,6 +23,120 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
+
+  /* UI 半透明控制（由 BackgroundProvider 动态写入） */
+  --ui-surface-alpha: 0.92; /* Card / Dialog 等容器底色 */
+  --ui-input-alpha: 0.88;   /* Input / Textarea / SelectTrigger 底色 */
+  --ui-border-alpha: 0.35;  /* 分割线/边框透明度 */
+  --ui-page-alpha: 1;       /* 页面底色（body 背景）透明度：有背景图时应接近 0 */
+}
+
+@layer utilities {
+  /* 统一的半透明“表面层”：跟随 BackgroundProvider 写入的 alpha */
+  .ui-surface {
+    background-color: hsl(var(--card) / var(--ui-surface-alpha));
+    border-color: hsl(var(--border) / var(--ui-border-alpha));
+  }
+
+  /* 更“淡”的内嵌表面层：用于卡片内部的小信息块，避免嵌套过白 */
+  .ui-surface-subtle {
+    background-color: hsl(var(--card) / calc(var(--ui-surface-alpha) * 0.55));
+    border-color: hsl(var(--border) / var(--ui-border-alpha));
+  }
+
+  /* 只控制边框/分割线颜色（不改变背景） */
+  .ui-border {
+    border-color: hsl(var(--border) / var(--ui-border-alpha));
+  }
+}
+
+/* 自动前景色模式：按背景图亮度强制切换 light/dark 变量（不依赖系统主题） */
+:root[data-ui-auto-theme="light"] {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+}
+
+:root[data-ui-auto-theme="dark"] {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
+}
+
+/* 自动主题=dark 时，兼容代码里仍在使用的 text-gray-xxx / border-white/xx 等类 */
+:root[data-ui-auto-theme="dark"] .text-gray-900,
+:root[data-ui-auto-theme="dark"] .text-gray-800 {
+  color: hsl(var(--foreground)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .text-gray-700,
+:root[data-ui-auto-theme="dark"] .text-gray-600,
+:root[data-ui-auto-theme="dark"] .text-gray-500,
+:root[data-ui-auto-theme="dark"] .text-gray-400 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .border-white\/50,
+:root[data-ui-auto-theme="dark"] .border-white\/30,
+:root[data-ui-auto-theme="dark"] .border-white\/20,
+:root[data-ui-auto-theme="dark"] .border-white\/10 {
+  border-color: hsl(var(--border)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .border-blue-500\/50 {
+  border-color: hsl(var(--primary)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .border-red-500\/50 {
+  border-color: hsl(var(--destructive)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .bg-white\/10 {
+  background-color: hsl(var(--muted) / 0.12) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .hover\:bg-white\/10:hover {
+  background-color: hsl(var(--muted) / 0.2) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .text-blue-600 {
+  color: hsl(var(--primary)) !important;
+}
+
+:root[data-ui-auto-theme="dark"] .text-red-600 {
+  color: hsl(var(--destructive)) !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +160,12 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+
+    /* 深色模式下默认略偏实，避免可读性下降 */
+    --ui-surface-alpha: 0.9;
+    --ui-input-alpha: 0.86;
+    --ui-border-alpha: 0.4;
+    --ui-page-alpha: 1;
   }
 
   .text-gray-900,
@@ -97,8 +217,14 @@
 }
 
 body {
-  background-color: hsl(var(--background));
+  background-color: hsl(var(--background) / var(--ui-page-alpha));
   color: hsl(var(--foreground));
+}
+
+/* 防止半透明“面板/容器”嵌套时叠加发白：内层 surface 默认透明（保留边框/间距即可） */
+[data-ui-surface] [data-ui-surface] {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
 }
 
 /* 确保所有表单元素都是透明的 */

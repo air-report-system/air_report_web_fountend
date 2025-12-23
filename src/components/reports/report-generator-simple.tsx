@@ -622,10 +622,10 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
               <select
                 value={formData.check_type}
                 onChange={(e) => handleInputChange('check_type', e.target.value)}
-                className={`w-full h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent ${
+                className={`w-full h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[hsl(var(--background)/var(--ui-input-alpha))] ${
                   inferredCheckType && inferredCheckType !== formData.check_type && checkTypeConfidence > 0.7
                     ? 'border-orange-500/50'
-                    : 'border-white/50'
+                    : 'ui-border'
                 }`}
                 disabled={isLoading}
               >
@@ -886,7 +886,7 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
                     size="sm"
                     variant="outline"
                     onClick={() => handleDownloadReport('docx')}
-                    className="text-blue-600 border-blue-500/50 hover:bg-white/10"
+                    className="text-blue-600 border-blue-500/50 hover:bg-muted/20"
                   >
                     <FileText className="mr-1 h-4 w-4" />
                     下载Word
@@ -897,7 +897,7 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
                     size="sm"
                     variant="outline"
                     onClick={() => handleDownloadReport('pdf')}
-                    className="text-red-600 border-red-500/50 hover:bg-white/10"
+                    className="text-red-600 border-red-500/50 hover:bg-muted/20"
                   >
                     <FileText className="mr-1 h-4 w-4" />
                     下载PDF
@@ -934,7 +934,7 @@ export function ReportGenerator({ ocrResult, onSuccess, onError }: ReportGenerat
                       onError?.('重新生成报告失败：' + formatError(error));
                     }
                   }}
-                  className="text-orange-600 border-orange-500/50 hover:bg-white/10"
+                  className="text-orange-600 border-orange-500/50 hover:bg-muted/20"
                 >
                   <RefreshCw className="mr-1 h-4 w-4" />
                   重新生成

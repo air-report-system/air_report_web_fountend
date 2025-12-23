@@ -119,7 +119,7 @@ export function VersionDisplayInline({ className = "" }: { className?: string })
       </div>
       
       {/* 悬停时显示的详细信息 */}
-      <div className="absolute top-full right-0 mt-2 p-3 rounded-lg border border-white/30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[280px]">
+      <div className="absolute top-full right-0 mt-2 p-3 rounded-lg border ui-surface opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[280px]">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="font-medium text-gray-700">前端版本:</span>

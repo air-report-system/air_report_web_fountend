@@ -350,7 +350,7 @@ CMA检测：是（2个点）
                       {Object.entries(processedOrder.order_data).map(([field, value]) => (
                         <TableCell 
                           key={field} 
-                          className="cursor-pointer hover:bg-white/10 relative"
+                          className="cursor-pointer hover:bg-muted/20 relative"
                           onDoubleClick={() => handleCellDoubleClick(rowIndex, field, value)}
                         >
                           {editingCell?.row === rowIndex && editingCell?.field === field ? (
@@ -369,7 +369,7 @@ CMA检测：是（2个点）
                                   value={tempValue}
                                   onChange={(e) => setTempValue(e.target.value)}
                                   onKeyDown={handleCellKeyPress}
-                                  className="w-full h-8 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-full h-8 text-sm border ui-border rounded-md bg-[hsl(var(--background)/var(--ui-input-alpha))] focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   autoFocus
                                 >
                                   <option value="">请选择</option>

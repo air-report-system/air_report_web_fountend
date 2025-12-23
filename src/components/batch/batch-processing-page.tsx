@@ -345,7 +345,7 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                     processingMode === 'manual'
                       ? 'border-blue-500 bg-transparent'
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'ui-border hover:border-blue-500/30'
                   }`}
                   onClick={() => setProcessingMode('manual')}
                 >
@@ -367,7 +367,7 @@ export function BatchProcessingPage({ onSuccess, onError }: BatchProcessingPageP
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                     processingMode === 'auto'
                       ? 'border-blue-500 bg-transparent'
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'ui-border hover:border-blue-500/30'
                   }`}
                   onClick={() => setProcessingMode('auto')}
                 >

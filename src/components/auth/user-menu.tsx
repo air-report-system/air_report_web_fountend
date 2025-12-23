@@ -47,7 +47,7 @@ export function UserMenu() {
         className="flex items-center gap-2 h-auto p-2"
         onClick={() => setShowMenu(!showMenu)}
       >
-        <div className="w-8 h-8 border border-white/50 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 border ui-border rounded-full flex items-center justify-center">
           <User className="h-4 w-4 text-blue-600" />
         </div>
         <div className="text-left">
@@ -71,8 +71,8 @@ export function UserMenu() {
           />
 
           {/* 菜单内容 */}
-          <div className="absolute right-0 top-full mt-2 w-56 rounded-md border border-white/50 z-50">
-            <div className="p-3 border-b border-white/50">
+          <div className="absolute right-0 top-full mt-2 w-56 rounded-md border ui-surface z-50">
+            <div className="p-3 border-b ui-border">
               <p className="text-sm font-medium text-gray-900">
                 你好, {user.first_name || user.username || user.email || '用户'}
               </p>
@@ -83,7 +83,7 @@ export function UserMenu() {
             <div className="py-1">
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/10 rounded-md">
+                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-muted/20 rounded-md">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>AI 配置</span>
                   </button>
@@ -98,7 +98,7 @@ export function UserMenu() {
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/10 rounded-md">
+                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-muted/20 rounded-md">
                     <ImageIcon className="mr-2 h-4 w-4" />
                     <span>背景图设置</span>
                   </button>
@@ -113,7 +113,7 @@ export function UserMenu() {
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/10 rounded-md">
+                  <button className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-muted/20 rounded-md">
                     <Database className="mr-2 h-4 w-4" />
                     <span>缓存管理</span>
                   </button>
@@ -129,7 +129,7 @@ export function UserMenu() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-white/10 rounded-md disabled:opacity-50"
+                className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-muted/20 rounded-md disabled:opacity-50"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>{isLoggingOut ? '登出中...' : '登出'}</span>

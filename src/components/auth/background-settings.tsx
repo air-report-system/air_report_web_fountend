@@ -204,10 +204,8 @@ export function BackgroundSettings() {
   };
 
   return (
-    <Card
-      className="border border-white/50 bg-white/20"
-    >
-      <CardHeader className="border-b border-white/50">
+    <Card className="ui-surface">
+      <CardHeader className="border-b ui-border">
         <CardTitle className="flex items-center gap-2 text-gray-900">
           <ImageIcon className="h-5 w-5" />
           背景图设置
@@ -220,7 +218,7 @@ export function BackgroundSettings() {
       <CardContent className="space-y-6 pt-6">
         {/* 消息提示 */}
         {message && (
-          <Alert className={message.type === 'error' ? 'border-white/50' : 'border-white/50'}>
+          <Alert className="ui-border">
             {message.type === 'error' ?
               <AlertCircle className="h-4 w-4 text-red-600" /> :
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -233,7 +231,7 @@ export function BackgroundSettings() {
 
         {/* 缓存信息 */}
         {cacheInfo.hasCache && (
-          <div className="bg-white/10 border border-white/30 rounded-lg p-4">
+          <div className="ui-surface-subtle border ui-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <Label className="flex items-center gap-2 text-gray-900 text-sm font-medium">
                 <HardDrive className="h-4 w-4" />
@@ -281,7 +279,7 @@ export function BackgroundSettings() {
         {settings.background_image && (
           <div className="space-y-2">
             <Label className="text-gray-900 drop-shadow-sm">当前背景图</Label>
-            <div className="relative w-full h-32 border rounded-lg overflow-hidden border-white/30">
+            <div className="relative w-full h-32 border rounded-lg overflow-hidden ui-border">
               <Image
                 src={settings.background_image}
                 alt="背景图预览"
@@ -326,7 +324,7 @@ export function BackgroundSettings() {
           <div
             className={`
               border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer
-              ${isDragging ? 'border-blue-400' : 'border-white/50 hover:border-white/70'}
+              ${isDragging ? 'border-blue-400' : 'ui-border'}
               ${isLoading ? 'opacity-50 pointer-events-none' : ''}
             `}
             onDragOver={handleDragOver}

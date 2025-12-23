@@ -71,8 +71,8 @@ export function CacheManagement() {
   }, [cacheInfo]);
 
   return (
-    <Card className="border border-white/50 bg-white/20">
-      <CardHeader className="border-b border-white/50">
+    <Card className="ui-surface">
+      <CardHeader className="border-b ui-border">
         <CardTitle className="flex items-center gap-2 text-gray-900">
           <Database className="h-5 w-5" />
           缓存管理
@@ -85,7 +85,7 @@ export function CacheManagement() {
       <CardContent className="space-y-6 pt-6">
         {/* 消息提示 */}
         {message && (
-          <Alert className="border-white/50">
+          <Alert className="ui-border">
             {message.type === 'error' ? 
               <AlertTriangle className="h-4 w-4 text-red-600" /> : 
               message.type === 'success' ?
@@ -136,7 +136,7 @@ export function CacheManagement() {
           <h3 className="text-sm font-medium text-gray-900">背景图缓存</h3>
           
           {cacheInfo.hasCache ? (
-            <div className="bg-white/10 border border-white/30 rounded-lg p-4 space-y-3">
+            <div className="ui-surface-subtle border ui-border rounded-lg p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-gray-600" />
@@ -160,7 +160,7 @@ export function CacheManagement() {
                 )}
               </div>
               
-              <div className="flex items-center justify-between pt-2 border-t border-white/20">
+              <div className="flex items-center justify-between pt-2 border-t ui-border">
                 <span className={`text-sm ${cacheInfo.isExpired ? 'text-orange-600' : 'text-green-600'}`}>
                   状态: {cacheInfo.isExpired ? '已过期' : '有效'}
                 </span>
@@ -189,7 +189,7 @@ export function CacheManagement() {
               </div>
             </div>
           ) : (
-            <div className="bg-white/10 border border-white/30 rounded-lg p-4 text-center text-gray-600">
+            <div className="ui-surface-subtle border ui-border rounded-lg p-4 text-center text-gray-600">
               <Database className="h-8 w-8 mx-auto mb-2 text-gray-400" />
               <p className="text-sm">暂无背景图缓存</p>
             </div>

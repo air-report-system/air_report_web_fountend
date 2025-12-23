@@ -61,7 +61,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         ref={ref}
         type="button"
         className={cn(
-          'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          'flex h-10 w-full items-center justify-between rounded-md border bg-[hsl(var(--background)/var(--ui-input-alpha))] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-[hsl(var(--input)/var(--ui-border-alpha))]',
           className
         )}
         onClick={() => setOpen(!open)}
@@ -96,7 +96,7 @@ const SelectContent = ({ children }: SelectContentProps) => {
         className="fixed inset-0 z-40"
         onClick={() => setOpen(false)}
       />
-      <div className="absolute top-full left-0 z-50 w-full mt-1 border border-white/30 rounded-md bg-transparent">
+      <div className="absolute top-full left-0 z-50 w-full mt-1 border ui-surface rounded-md">
         {children}
       </div>
     </>
@@ -113,7 +113,7 @@ const SelectItem = ({ value, children }: SelectItemProps) => {
 
   return (
     <div
-      className="px-3 py-2 text-sm cursor-pointer hover:bg-white/10 first:rounded-t-md last:rounded-b-md"
+      className="px-3 py-2 text-sm cursor-pointer hover:bg-muted/20 first:rounded-t-md last:rounded-b-md"
       onClick={handleClick}
     >
       {children}

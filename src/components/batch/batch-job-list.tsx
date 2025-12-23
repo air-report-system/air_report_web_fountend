@@ -232,7 +232,7 @@ export function BatchJobList({ onSuccess, onError, onJobSelected }: BatchJobList
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-3 py-2 border ui-border rounded-md bg-[hsl(var(--background)/var(--ui-input-alpha))] focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {StatusFilterOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -279,7 +279,7 @@ export function BatchJobList({ onSuccess, onError, onJobSelected }: BatchJobList
               {filteredJobs.map((job: BatchJob) => (
                 <div
                   key={job.id}
-                  className="p-4 border rounded-lg hover:bg-white/10 transition-colors border-white/20"
+                  className="p-4 border rounded-lg hover:bg-muted/20 transition-colors ui-border"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">

@@ -255,8 +255,8 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
             <div className="mb-6">
               <Label>订单信息编辑</Label>
               <div className="mt-2 overflow-x-auto">
-                <table className="w-full border border-gray-200 rounded-lg">
-                  <thead className="border-b border-white/20">
+                <table className="w-full border ui-border rounded-lg">
+                  <thead className="border-b ui-border">
                     <tr>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">字段</th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">值</th>
@@ -264,7 +264,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
                   </thead>
                   <tbody>
                     {Object.entries(orderData).map(([key, value], index) => (
-                      <tr key={key} className={index % 2 === 0 ? 'bg-white/10' : 'bg-white/5'}>
+                      <tr key={key} className={index % 2 === 0 ? 'bg-muted/10' : 'bg-transparent'}>
                         <td className="px-4 py-2 text-sm font-medium text-gray-600 border-b">{key}</td>
                         <td className="px-4 py-2 border-b">
                           {key === '履约时间' ? (
@@ -278,7 +278,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
                             <select
                               value={value}
                               onChange={(e) => setOrderData(prev => ({ ...prev, [key]: e.target.value }))}
-                              className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-1 text-sm border ui-border rounded-md bg-[hsl(var(--background)/var(--ui-input-alpha))] focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                               <option value="">请选择</option>
                               <option value="国标">国标</option>
@@ -327,7 +327,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
                   value={reformatCsvData(formattedCsv)}
                   readOnly
                   rows={3}
-                  className="mt-1 font-mono text-sm border border-white/30 rounded p-2"
+                  className="mt-1 font-mono text-sm border ui-surface-subtle ui-border rounded p-2"
                 />
               </div>
             )}
@@ -336,7 +336,7 @@ export function OrderInfoForm({ onSuccess, onError }: OrderInfoFormProps) {
             <Button
               onClick={handleSubmitOrder}
               disabled={isSubmitting || validationErrors.length > 0}
-              className={`w-full ${duplicateCheck && duplicateCheck.is_duplicate ? 'border-yellow-500/50 hover:bg-white/10' : ''}`}
+              className={`w-full ${duplicateCheck && duplicateCheck.is_duplicate ? 'border-yellow-500/50 hover:bg-muted/20' : ''}`}
             >
               {isSubmitting ? (
                 <>
