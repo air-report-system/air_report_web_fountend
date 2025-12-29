@@ -3,25 +3,24 @@
  */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FileUpload } from '@/components/ui/file-upload';
-import { Badge } from '@/components/ui/badge';
 import { 
   BarChart3, 
   Download, 
   FileSpreadsheet, 
   Settings, 
   CheckCircle,
-  AlertCircle,
   Calculator,
   TrendingUp
 } from 'lucide-react';
-import { monthlyReportApi } from '@/lib/api';
+import { fileApi, monthlyReportApi } from '@/lib/api';
 import { formatError, downloadFile } from '@/lib/utils';
+import { MonthlyAIChat } from './monthly-ai-chat';
 
 interface MonthlyReportProps {
   onSuccess?: (result: any) => void;
@@ -35,6 +34,95 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
   const [uniformProfitRate, setUniformProfitRate] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  const [uploadedCsvFileId, setUploadedCsvFileId] = useState<number | null>(null);
+
+  const [csvPreview, setCsvPreview] = useState<{
+    columns: string[];
+    rows_head: string[][];
+    total_rows: number;
+  } | null>(null);
+
+  const [columnFilter, setColumnFilter] = useState('');
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+
+  const [excelPreview, setExcelPreview] = useState<{
+    sheet: string;
+    columns: string[];
+    rows_head: string[][];
+    rows_tail: string[][];
+    total_rows: number;
+  } | null>(null);
+
+  const reportId = generatedReport?.id as number | undefined;
+  const summary = (generatedReport?.summary_data || {}) as Record<string, unknown>;
+  const summaryDisplay = useMemo(() => {
+    // CSV流：MonthlyReportService._generate_summary_data
+    // DB流：MonthlyReportService._generate_summary_data_db
+    const s = summary as any;
+    const totalOrders = s.total_orders ?? s.order_count ?? s.total_orders_processed ?? 0;
+    const totalRevenue = s.total_revenue ?? s.total_sales_amount ?? s.total_amount ?? 0;
+    const totalProfit = s.total_profit ?? s.total_profit_amount ?? 0;
+    const totalCmaCost = s.total_cma_cost ?? 0;
+    return { totalOrders, totalRevenue, totalProfit, totalCmaCost };
+  }, [summary]);
+
+  const filteredColumns = useMemo(() => {
+    if (!csvPreview?.columns) return [];
+    const key = columnFilter.trim();
+    if (!key) return csvPreview.columns;
+    return csvPreview.columns.filter((c) => c.includes(key));
+  }, [csvPreview?.columns, columnFilter]);
+
+  // 上传CSV并拉取预览（列清单 + 前N行）
+  const uploadAndPreviewMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const uploadResp = await fileApi.upload(file, 'spreadsheet');
+      const csv_file_id = uploadResp.data?.id;
+      if (!csv_file_id) throw new Error('CSV上传成功但未返回文件ID');
+
+      const previewResp = await monthlyReportApi.previewCsv({
+        csv_file_id,
+        uniform_profit_rate: uniformProfitRate,
+      });
+
+      return { csv_file_id, preview: previewResp.data };
+    },
+    onSuccess: ({ csv_file_id, preview }) => {
+      setUploadedCsvFileId(csv_file_id);
+      setCsvPreview(preview);
+      const cols = (preview?.columns || []) as string[];
+      setSelectedColumns(cols);
+    },
+    onError: (error) => {
+      onError?.(formatError(error));
+    },
+  });
+
+  const isCsvPreviewLoading = uploadAndPreviewMutation.isPending;
+  const csvPreviewErrorText = useMemo(() => {
+    if (!uploadAndPreviewMutation.isError) return '';
+    return formatError(uploadAndPreviewMutation.error);
+  }, [uploadAndPreviewMutation.isError, uploadAndPreviewMutation.error]);
+
+  // 拉取已生成Excel预览（head/tail）
+  const fetchExcelPreviewMutation = useMutation({
+    mutationFn: (rid: number) => monthlyReportApi.excelPreview(rid),
+    onSuccess: (resp) => {
+      setExcelPreview(resp.data);
+    },
+    onError: (error) => {
+      onError?.(formatError(error));
+    },
+  });
+
+  useEffect(() => {
+    if (reportId) {
+      fetchExcelPreviewMutation.mutate(reportId);
+    } else {
+      setExcelPreview(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportId]);
 
   // 生成月度报表mutation
   const generateReportMutation = useMutation({
@@ -44,10 +132,22 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
       uniformProfitRate?: boolean; 
       laborCostFile?: File; 
     }) => {
-      return monthlyReportApi.generate(data.csvFile, {
-        output_name: data.outputName,
-        uniform_profit_rate: data.uniformProfitRate,
-        labor_cost_file: data.laborCostFile
+      const ensureCsvFileId = async () => {
+        if (uploadedCsvFileId) return uploadedCsvFileId;
+        const uploadResp = await fileApi.upload(data.csvFile, 'spreadsheet');
+        const csv_file_id = uploadResp.data?.id;
+        if (!csv_file_id) throw new Error('CSV上传成功但未返回文件ID');
+        setUploadedCsvFileId(csv_file_id);
+        return csv_file_id;
+      };
+
+      return ensureCsvFileId().then((csv_file_id) => {
+        return monthlyReportApi.generateFromCsv({
+          csv_file_id,
+          output_name: data.outputName,
+          uniform_profit_rate: data.uniformProfitRate,
+          selected_columns: selectedColumns.length > 0 ? selectedColumns : undefined,
+        });
       });
     },
     onSuccess: (data) => {
@@ -62,8 +162,9 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
 
   // 下载报表mutation
   const downloadMutation = useMutation({
-    mutationFn: (filename: string) => monthlyReportApi.download(filename),
-    onSuccess: (data, filename) => {
+    mutationFn: (rid: number) => monthlyReportApi.downloadExcel(rid),
+    onSuccess: (data, rid) => {
+      const filename = generatedReport?.title ? `${generatedReport.title}.xlsx` : `monthly_report_${rid}.xlsx`;
       downloadFile(data.data, filename);
       onSuccess?.('报表下载成功');
     },
@@ -74,7 +175,18 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
   });
 
   const handleCsvFileChange = (files: File[]) => {
-    setCsvFile(files[0] || null);
+    const f = files[0] || null;
+    setCsvFile(f);
+    setGeneratedReport(null);
+    setUploadedCsvFileId(null);
+    setCsvPreview(null);
+    setSelectedColumns([]);
+    setColumnFilter('');
+    setExcelPreview(null);
+
+    if (f) {
+      uploadAndPreviewMutation.mutate(f);
+    }
   };
 
   const handleLaborCostFileChange = (files: File[]) => {
@@ -84,6 +196,19 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
   const handleGenerateReport = () => {
     if (!csvFile) {
       onError?.('请先上传CSV文件');
+      return;
+    }
+
+    if (isCsvPreviewLoading) {
+      onError?.('CSV预览正在加载，请稍候再生成报表');
+      return;
+    }
+    if (!csvPreview) {
+      onError?.('CSV预览尚未生成（可能上传/预览失败），请稍后或点击重试');
+      return;
+    }
+    if (selectedColumns.length === 0) {
+      onError?.('请至少选择一列用于导出');
       return;
     }
 
@@ -98,15 +223,19 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
   };
 
   const handleDownloadReport = () => {
-    if (!generatedReport?.filename) {
+    if (!reportId) {
       onError?.('没有可下载的报表');
       return;
     }
 
-    downloadMutation.mutate(generatedReport.filename);
+    downloadMutation.mutate(reportId);
   };
 
-  const isLoading = generateReportMutation.isPending || downloadMutation.isPending;
+  const isLoading =
+    generateReportMutation.isPending ||
+    downloadMutation.isPending ||
+    uploadAndPreviewMutation.isPending ||
+    fetchExcelPreviewMutation.isPending;
 
   return (
     <Card className="w-full">
@@ -138,6 +267,134 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
             </div>
           )}
         </div>
+
+        {/* CSV预览 + 列选择（用于最终Excel导出） */}
+        {csvFile && (
+          <div className="p-4 rounded-lg ui-surface-subtle ui-border space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="font-medium text-gray-900">表头列选择（用于最终Excel导出）</h4>
+              {csvPreview ? (
+                <div className="text-xs text-gray-500">
+                  共 {csvPreview.columns.length} 列 / {csvPreview.total_rows} 行
+                </div>
+              ) : (
+                <div className="text-xs text-gray-500">正在准备预览…</div>
+              )}
+            </div>
+
+            {isCsvPreviewLoading && (
+              <div className="text-sm text-gray-600">
+                正在解析 CSV 并生成预览/列清单，请稍候…
+              </div>
+            )}
+
+            {!isCsvPreviewLoading && csvPreviewErrorText && (
+              <div className="space-y-2">
+                <div className="text-sm text-red-600">预览失败：{csvPreviewErrorText}</div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => csvFile && uploadAndPreviewMutation.mutate(csvFile)}
+                  disabled={isLoading}
+                >
+                  重试预览
+                </Button>
+              </div>
+            )}
+
+            {csvPreview && (
+              <>
+            <div className="flex flex-col md:flex-row gap-3">
+              <Input
+                value={columnFilter}
+                onChange={(e) => setColumnFilter(e.target.value)}
+                placeholder="搜索列名..."
+                disabled={isLoading}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedColumns(csvPreview.columns)}
+                  disabled={isLoading}
+                >
+                  全选
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedColumns([])}
+                  disabled={isLoading}
+                >
+                  全不选
+                </Button>
+              </div>
+            </div>
+
+            <div className="max-h-48 overflow-auto rounded-md ui-border ui-surface-subtle p-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {filteredColumns.map((col) => {
+                  const checked = selectedColumns.includes(col);
+                  return (
+                    <label key={col} className="flex items-center gap-2 text-sm text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          const next = e.target.checked
+                            ? Array.from(new Set([...selectedColumns, col]))
+                            : selectedColumns.filter((x) => x !== col);
+                          setSelectedColumns(next);
+                        }}
+                        disabled={isLoading}
+                        className="h-4 w-4"
+                      />
+                      <span className="truncate" title={col}>
+                        {col}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-500">已选择 {selectedColumns.length} 列</div>
+
+            {/* 简单预览：CSV head */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-gray-900">CSV 预览（前几行）</div>
+              <div className="rounded-md ui-border ui-surface-subtle overflow-auto">
+                <table className="min-w-full text-xs">
+                  <thead className="sticky top-0 bg-white/70 backdrop-blur">
+                    <tr>
+                      {csvPreview.columns.map((c, idx) => (
+                        <th key={idx} className="text-left p-2 border-b ui-border whitespace-nowrap">
+                          {c || '(空列名)'}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {csvPreview.rows_head.map((row, rIdx) => (
+                      <tr key={rIdx} className="border-b border-white/10">
+                        {row.map((v, cIdx) => (
+                          <td key={cIdx} className="p-2 whitespace-nowrap">
+                            {v}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* 基本设置 */}
         <div className="space-y-4">
@@ -219,7 +476,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
         <div className="flex gap-3">
           <Button
             onClick={handleGenerateReport}
-            disabled={!csvFile || isLoading}
+            disabled={!csvFile || isLoading || isCsvPreviewLoading || !csvPreview || selectedColumns.length === 0}
             loading={generateReportMutation.isPending}
             className="flex-1"
           >
@@ -251,25 +508,116 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet className="h-4 w-4 text-green-600" />
-                <span>文件：{generatedReport.filename}</span>
+                <span>标题：{generatedReport.title || '(未命名)'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calculator className="h-4 w-4 text-green-600" />
-                <span>总订单：{generatedReport.total_orders || 0}个</span>
+                <span>月份：{generatedReport.report_month_display || generatedReport.report_month || '-'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-green-600" />
-                <span>总金额：¥{generatedReport.total_amount || 0}</span>
+                <span>Excel：{generatedReport.excel_file ? '已生成' : '无'}</span>
               </div>
             </div>
 
-            {generatedReport.summary && (
+            {generatedReport.summary_data && (
               <div className="mt-3 text-sm text-green-700">
-                <p>净利润：¥{generatedReport.summary.net_profit || 0}</p>
-                <p>成功率：{generatedReport.summary.success_rate || 0}%</p>
+                <p>成交金额总计：¥{summaryDisplay.totalRevenue ?? 0}</p>
+                <p>分润金额总计：¥{summaryDisplay.totalProfit ?? 0}</p>
+                <p>CMA成本总计：¥{summaryDisplay.totalCmaCost ?? 0}</p>
+                <p>订单总数：{summaryDisplay.totalOrders ?? 0}</p>
               </div>
             )}
           </div>
+        )}
+
+        {/* Excel预览（基于已生成文件，head/tail） */}
+        {reportId && (
+          <div className="p-4 rounded-lg ui-surface-subtle ui-border space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="font-medium text-gray-900">已生成Excel预览</h4>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchExcelPreviewMutation.mutate(reportId)}
+                  disabled={isLoading}
+                >
+                  刷新预览
+                </Button>
+              </div>
+            </div>
+
+            {excelPreview ? (
+              <div className="space-y-3">
+                <div className="text-xs text-gray-500">
+                  Sheet：{excelPreview.sheet} • 数据行数：{excelPreview.total_rows}
+                </div>
+
+                <div className="rounded-md ui-border ui-surface-subtle overflow-auto">
+                  <table className="min-w-full text-xs">
+                    <thead className="sticky top-0 bg-white/70 backdrop-blur">
+                      <tr>
+                        {excelPreview.columns.map((c, idx) => (
+                          <th key={idx} className="text-left p-2 border-b ui-border whitespace-nowrap">
+                            {c || '(空列名)'}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {excelPreview.rows_head.map((row, rIdx) => (
+                        <tr key={`h-${rIdx}`} className="border-b border-white/10">
+                          {row.map((v, cIdx) => (
+                            <td key={cIdx} className="p-2 whitespace-nowrap">
+                              {v}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+
+                      {excelPreview.rows_tail.length > 0 && (
+                        <tr>
+                          <td
+                            colSpan={Math.max(1, excelPreview.columns.length)}
+                            className="p-2 text-center text-gray-400 border-y border-white/20"
+                          >
+                            … 后续行省略 …
+                          </td>
+                        </tr>
+                      )}
+
+                      {excelPreview.rows_tail.map((row, rIdx) => (
+                        <tr key={`t-${rIdx}`} className="border-b border-white/10">
+                          {row.map((v, cIdx) => (
+                            <td key={cIdx} className="p-2 whitespace-nowrap">
+                              {v}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">
+                {fetchExcelPreviewMutation.isPending ? '正在加载预览...' : '暂无预览数据'}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* AI 对话：WS 实时计算并写回Excel，完成后刷新预览 */}
+        {reportId && (
+          <MonthlyAIChat
+            reportId={reportId}
+            onError={(msg) => onError?.(msg)}
+            onFinal={() => {
+              fetchExcelPreviewMutation.mutate(reportId);
+            }}
+          />
         )}
 
         {/* CSV格式说明 */}
@@ -290,7 +638,7 @@ export function MonthlyReport({ onSuccess, onError }: MonthlyReportProps) {
             <BarChart3 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-gray-500 mb-2">报表预览区域</p>
             <p className="text-sm text-gray-400">
-              上传CSV文件并配置基本信息后，点击"生成报表"查看预览
+              上传CSV文件后会自动加载列清单与CSV预览；点击“生成报表”后将生成Excel并支持预览与下载
             </p>
           </div>
         )}

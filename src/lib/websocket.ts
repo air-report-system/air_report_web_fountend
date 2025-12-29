@@ -9,6 +9,51 @@ export interface WebSocketMessage {
   timestamp: number;
 }
 
+/**
+ * 构建 WebSocket URL
+ *
+ * 本项目 HTTP 请求通过 Next.js rewrite 代理到后端（默认 http://localhost:8000），
+ * 但 WebSocket 不会被 rewrite 代理，因此这里默认直连后端。
+ *
+ * 你可以通过环境变量覆盖：
+ * - BACKEND_URL（next.config.ts 已注入到前端）
+ * - NEXT_PUBLIC_API_URL（如果你用它来配置后端地址）
+ */
+export function getWebSocketUrl(path: string, params?: Record<string, string>): string {
+  // 允许用户直接提供 ws:// 或 wss://
+  const rawBase =
+    (process.env.BACKEND_URL as string | undefined) ||
+    (process.env.NEXT_PUBLIC_API_URL as string | undefined) ||
+    'http://localhost:8000';
+
+  // 兼容传入类似 http://host:8000/api/v1 的情况
+  const base = rawBase.replace(/\/api\/v1\/?$/, '');
+
+  let url: URL;
+  try {
+    url = new URL(base);
+  } catch {
+    // 如果 base 不是完整URL，则退回同源（不推荐，但避免直接崩）
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    url = new URL(`${protocol}//${host}`);
+  }
+
+  const wsProtocol = url.protocol === 'https:' ? 'wss:' : (url.protocol === 'wss:' ? 'wss:' : 'ws:');
+  const wsBase = `${wsProtocol}//${url.host}`;
+
+  const p = path.startsWith('/') ? path : `/${path}`;
+  const full = new URL(`${wsBase}${p}`);
+
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && String(v) !== '') full.searchParams.set(k, String(v));
+    });
+  }
+
+  return full.toString();
+}
+
 export interface BatchProgressUpdate {
   batch_job_id: number;
   progress_percentage: number;
@@ -196,10 +241,8 @@ let wsManager: WebSocketManager | null = null;
 // 获取WebSocket管理器实例
 export function getWebSocketManager(): WebSocketManager {
   if (!wsManager) {
-    // 构建WebSocket URL
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/batch/`;
+    const token = (typeof window !== 'undefined' ? localStorage.getItem('auth_token') : '') || '';
+    const wsUrl = getWebSocketUrl('/ws/batch/', token ? { token } : undefined);
     
     wsManager = new WebSocketManager(wsUrl);
   }

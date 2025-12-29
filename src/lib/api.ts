@@ -401,32 +401,27 @@ export const batchApi = {
 
 // 月度报表相关API
 export const monthlyReportApi = {
-  // 上传CSV并生成月度报表
-  generate: (file: File, data: {
+  // 预览CSV（列清单 + 前N行）
+  previewCsv: (data: {
+    csv_file_id: number;
+    uniform_profit_rate?: boolean;
+    head_rows?: number;
+  }) => api.post('/monthly/preview-csv/', data),
+
+  // 基于已上传CSV生成月度报表（可传 selected_columns）
+  generateFromCsv: (data: {
+    csv_file_id: number;
     output_name?: string;
     uniform_profit_rate?: boolean;
-    labor_cost_file?: File;
-  }) => {
-    const formData = new FormData();
-    formData.append('csv_file', file);
-    if (data.output_name) formData.append('output_name', data.output_name);
-    if (data.uniform_profit_rate !== undefined) {
-      formData.append('uniform_profit_rate', data.uniform_profit_rate.toString());
-    }
-    if (data.labor_cost_file) {
-      formData.append('labor_cost_file', data.labor_cost_file);
-    }
-    
-    return api.post('/reports/monthly/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  },
+    selected_columns?: string[];
+  }) => api.post('/monthly/generate-from-csv/', data),
 
-  // 下载月度报表
-  download: (filename: string) => 
-    api.get(`/reports/monthly/download/${filename}/`, { responseType: 'blob' }),
+  // 下载生成的Excel（按 report_id）
+  downloadExcel: (reportId: number) =>
+    api.get(`/monthly/reports/${reportId}/download_excel`, { responseType: 'blob' }),
+
+  // 预览已生成Excel（head/tail）
+  excelPreview: (reportId: number) => api.get(`/monthly/reports/${reportId}/excel-preview`),
 };
 
 // 文件上传相关API
