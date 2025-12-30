@@ -43,13 +43,12 @@ export interface AiSystemStatus {
 }
 
 export interface TestResult {
-    success: boolean;
-    message: string;
-    result?: {
-        success: boolean;
-        response_time_ms: number;
-        test_time: string;
-    };
+  success: boolean;
+  http_status: number;
+  message: string;
+  response_time_ms?: number | null;
+  sample_output?: string;
+  error_message?: string;
 }
 
 interface AiConfigContextType {
@@ -167,10 +166,35 @@ export const AiConfigProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const testConfig = async (id: number) => {
-    const response = await handleApiCall(() => api.post(`ai-config/configs/${id}/test`));
-    if (response) {
-        await fetchConfigs(); // 测试后可能会更新统计信息
-        return response.data;
+    if (!isAuthenticated) {
+      return {
+        success: false,
+        http_status: 401,
+        message: '用户未认证，无法执行测试',
+        error_message: 'unauthenticated',
+      };
+    }
+    // 测试是“可失败”的操作：不要把失败写进全局 error，避免整个页面显示“加载失败”
+    try {
+      const resp = await api.post(`ai-config/configs/${id}/test`);
+      const data = resp?.data || {};
+      return {
+        success: Boolean(data.success),
+        http_status: Number(data.http_status ?? 200),
+        message: String(data.message ?? '测试成功'),
+        response_time_ms: data.response_time_ms ?? null,
+        sample_output: data.sample_output ? String(data.sample_output) : undefined,
+      };
+    } catch (err: any) {
+      const status = err?.response?.status ?? 0;
+      const data = err?.response?.data || {};
+      return {
+        success: false,
+        http_status: status,
+        message: String(data.message ?? '测试失败'),
+        response_time_ms: data.response_time_ms ?? null,
+        error_message: String(data.error_message ?? data.detail ?? err?.message ?? 'unknown error'),
+      };
     }
   };
 
