@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { formatError, downloadFile } from '@/lib/utils';
 import api from '@/lib/api';
+import { MonthlyAIChat } from './monthly-ai-chat';
 
 interface MonthlyReportDBProps {
   onSuccess?: (result: any) => void;
@@ -441,6 +442,16 @@ export function MonthlyReportDB({ onSuccess, onError }: MonthlyReportDBProps) {
               </div>
             )}
           </div>
+        )}
+
+        {generatedReport?.id && (
+          <MonthlyAIChat
+            reportId={generatedReport.id}
+            onError={(msg) => onError?.(msg)}
+            onFinal={() => {
+              onSuccess?.('AI 计算结果已写回 Excel，请下载最新报表查看');
+            }}
+          />
         )}
 
         {/* 功能说明 */}
